@@ -1,0 +1,202 @@
+:root {
+    --bg-color: #1a1a1a;
+    --text-color: #ffffff;
+    --accent-color: #0077FF;
+    --secondary-color: #44FFD1;
+    --grid-color: rgb(56, 145, 214);
+}
+
+[data-theme="light"] {
+    --bg-color: #ffffff;
+    --text-color: #333333;
+    --accent-color: #4a90e2;
+    --grid-color: rgb(74, 144, 226);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%; 
+    opacity: 0.8;
+}
+
+canvas {
+    display: block;
+}
+
+.controls {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 100;
+}
+
+.controls label {
+    display: block;
+    margin: 5px 0;
+    color: white;
+    font-size: 12px;
+}
+
+.controls input[type="range"] {
+    width: 100px;
+}
+
+.tooltip {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 3px;
+    font-size: 12px;
+    display: none;
+    z-index: 100;
+}
+
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    padding: 10px;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, background-color 0.3s;
+    z-index: 100;
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1);
+}
+
+.container {
+    text-align: center;
+    z-index: 1;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(5px);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+h1 {
+    font-size: 3rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    color: var(--accent-color);
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    opacity: 0.8;
+}
+
+.links {
+    display: flex;
+    gap: 3rem; /* Increased gap between links */
+    margin-top: 30px; /* Increased margin */
+    justify-content: center;
+    flex-wrap: wrap; /* Allow wrapping for smaller screens */
+}
+
+.link {
+    color: var(--text-color);
+    font-size: 2rem; /* Increased font size */
+    transition: all 0.3s ease;
+    text-decoration: none;
+    padding: 15px; /* Increased padding */
+    border: 2px solid transparent; /* Optional: Add border for hover effect */
+    border-radius: 5px; /* Optional: Rounded corners */
+}
+
+.link:hover {
+    color: var(--accent-color);
+    transform: translateY(-5px); /* Slightly increased hover effect */
+    border-color: var(--accent-color); /* Optional: Highlight border on hover */
+}
+.container {
+/* Existing styles */
+pointer-events: none; /* Add this line */
+}
+.links, .link {
+pointer-events: auto; /* Add this to keep links clickable */
+}
+
+.controls-container {
+position: fixed;
+top: 10px;
+right: 10px;
+z-index: 200; /* Ensure it is above other elements */
+display: flex;
+flex-direction: column; /* Stack the button and controls vertically */
+}
+
+.toggle-controls {
+background: var(--accent-color);
+color: white;
+border: none;
+padding: 10px;
+border-radius: 5px;
+cursor: pointer;
+font-size: 14px;
+margin-bottom: 5px;
+z-index: 201; /* Ensure the button is above the controls */
+position: relative; /* Ensure it stays in the flow of the container */
+}
+
+.controls {
+background: rgba(0, 0, 0, 0.7);
+padding: 10px;
+border-radius: 5px;
+display: block; /* Initially visible */
+z-index: 200; /* Ensure it is below the button */
+transition: display 0.3s ease; /* Smooth transition for display */
+display: none; /* Initially hidden */
+margin-top: 50px; /* Space between button and controls */
+}
+
+.controls label {
+display: block;
+margin: 5px 0;
+color: white;
+font-size: 12px;
+}
+
+.controls input[type="range"] {
+width: 100px;
+}

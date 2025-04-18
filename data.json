@@ -1,0 +1,34 @@
+{
+  "personalInfo": {
+    "name": "Krupal Virani",
+    "penName": "pSwaqtch",
+    "title": "Maker & Computer Science Student",
+    "education": "B.Tech CSE - 4th Semester",
+    "bio": "A passionate maker and computer science enthusiast exploring the intersection of hardware and software. Currently working on innovative projects combining physical computing with software solutions."
+  },
+  "contact": {
+    "email": "krupalvirani@gmail.com",
+    "social": {
+      "email": "krupalvirani@gmail.com",
+      "twitter": "https://x.com/pSwaqtch",
+      "mastodon": "https://mastodon.social/@pSwaqtch",
+      "reddit": "https://www.reddit.com/user/pSwaqtch",
+      "instagram": "https://www.instagram.com/pSwaqtch",
+      "linkedin": "https://www.linkedin.com/in/krupal-virani-9092b82a0/"
+    }
+  },
+  "theme": {
+    "colors": {
+      "primary": "#FF7700",
+      "secondary": "#003366",
+      "accent": "#44FFD1",
+      "background": "#FFFFFF",
+      "surface": "#FFFDE8",
+      "text": "#333333"
+    },
+    "fonts": {
+      "heading": "Arial",
+      "body": "Arial"
+    }
+  }
+} 
