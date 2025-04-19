@@ -447,7 +447,7 @@
     document.addEventListener("DOMContentLoaded", async () => {
     try {
         // Fetch data from data.json
-        const response = await fetch('public/data.json');
+        const response = await fetch('data.json');
         const data = await response.json();
 
         // Update name and title
