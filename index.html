@@ -3,55 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio with Gravity Grid</title>
-    <link rel="stylesheet" href="styles.css">
-
+    <title>Krupal Virani</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
-<body>
+<body data-theme="dark">
     <!-- Gravity Grid Background -->
     <canvas id="gravityGrid" class="background"></canvas>
-
-    <!-- Theme Toggle Button -->
-    <button class="theme-toggle" onclick="toggleTheme()">
-        <i class="fas fa-sun"></i>
-    </button>
-
-    <!-- Controls for Gravity Effect -->
-    <div class="controls-container">
-        <div>
-            <button class="toggle-controls" onclick="toggleControls()">Controls</button>
-        </div>
-        <div class="controls" id="controls">
-            <label>
-                Grid Spacing: 
-                <input type="range" id="spacingRange" min="10" max="100" value="20" oninput="syncSpacing(this.value)">
-                <input type="number" id="spacingInput" min="10" max="100" value="20" onchange="syncSpacing(this.value)">
-            </label>
-            <label>
-                Gravity Force: 
-                <input type="range" id="warpRange" min="1000" max="15000" value="9800" oninput="syncWarpStrength(this.value)">
-                <input type="number" id="warpInput" min="1000" max="15000" value="9800" onchange="syncWarpStrength(this.value)">
-            </label>
-            <label>
-                Max Distance: 
-                <input type="range" id="maxDistanceRange" min="50" max="500" value="100" oninput="syncMaxDistance(this.value)">
-                <input type="number" id="maxDistanceInput" min="50" max="500" value="100" onchange="syncMaxDistance(this.value)">
-            </label>
-            <label>
-                Max Displacement: 
-                <input type="range" id="maxDisplacementRange" min="10" max="200" value="125" oninput="syncMaxDisplacement(this.value)">
-                <input type="number" id="maxDisplacementInput" min="10" max="200" value="125" onchange="syncMaxDisplacement(this.value)">
-            </label>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="container">
-        <h1>Krupal Virani</h1>
-        <p class="subtitle">Web Developer & Designer</p>
-        <div class="links"> 
-        </div>
-    </div>
 
     <!-- Tooltip -->
     <div id="tooltip" class="tooltip">Hover over me!</div>
@@ -59,7 +17,7 @@
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <script src="main.js"></script>
+    <script type="module" src="js/main.js"></script>
 
 </body>
 </html>
