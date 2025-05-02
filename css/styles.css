@@ -200,3 +200,26 @@ font-size: 12px;
 .controls input[type="range"] {
 width: 100px;
 }
+
+.cursor-toggle {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    padding: 10px;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, background-color 0.3s;
+    z-index: 100;
+}
+
+.cursor-toggle:hover {
+    transform: scale(1.1);
+}
