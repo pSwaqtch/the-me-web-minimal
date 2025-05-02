@@ -57,6 +57,11 @@ const state = {
   },
   isTouchDevice: "ontouchstart" in window || navigator.maxTouchPoints,
   isCustomCursorEnabled: true,
+  lastFrameTime: 0,
+  frameCount: 0,
+  fps: 0,
+  isHighDensity: false,
+  worker: null,
 };
 
 // DOM Elements Cache
@@ -69,8 +74,28 @@ const elements = {
   cursorToggle: null,
 };
 
+// Add this after the CONFIG object
+const PERFORMANCE = {
+  targetFPS: 60,
+  minFPS: 30,
+  densityAdjustmentInterval: 1000, // Check FPS every second
+  lastDensityCheck: 0,
+};
+
 // Initialize DOM Elements
 function initializeDOM() {
+  // Add Warning Banner
+  const warningBanner = document.createElement("div");
+  warningBanner.className = "warning-banner";
+  warningBanner.innerHTML = `
+    <div class="warning-content">
+      <i class="fas fa-exclamation-triangle"></i>
+      <span>WARNING: UNDER PROGRESS</span>
+      <i class="fas fa-exclamation-triangle"></i>
+    </div>
+  `;
+  document.body.appendChild(warningBanner);
+
   // remmove the default cursor
   document.body.style.cursor = "none";
   document.body.style.userSelect = "none";
@@ -164,6 +189,11 @@ function initializeDOM() {
   controlsContainer.style.cursor = "default";
   document.body.appendChild(controlsContainer);
 
+  // want normal cursor on this controls container and turn off custom cursor just call the toggleCustomCursor function on hover on and hover off over this
+  controlsContainer.addEventListener("mouseenter", () => toggleCustomCursor());
+  controlsContainer.addEventListener("mouseleave", () => toggleCustomCursor());
+
+
   // Add event listeners to the controls after they're in the DOM
   controls.forEach(control => {
     const rangeInput = document.getElementById(`${control.id}Range`);
@@ -201,7 +231,36 @@ function initializeDOM() {
   linksContainer.className = "links";
   container.appendChild(linksContainer);
 
-  document.body.appendChild(container);
+  // Create main content wrapper
+  const mainWrapper = document.createElement("div");
+  mainWrapper.className = "main-wrapper";
+
+  // Create projects column
+  const projectsColumn = document.createElement("div");
+  projectsColumn.className = "column projects-column";
+  const projectsTitle = document.createElement("h2");
+  projectsTitle.textContent = "Projects";
+  projectsColumn.appendChild(projectsTitle);
+  const projectsList = document.createElement("div");
+  projectsList.className = "content-list";
+  projectsColumn.appendChild(projectsList);
+
+  // Create blogs column
+  const blogsColumn = document.createElement("div");
+  blogsColumn.className = "column blogs-column";
+  const blogsTitle = document.createElement("h2");
+  blogsTitle.textContent = "Blogs";
+  blogsColumn.appendChild(blogsTitle);
+  const blogsList = document.createElement("div");
+  blogsList.className = "content-list";
+  blogsColumn.appendChild(blogsList);
+
+  // Add columns to wrapper
+  mainWrapper.appendChild(projectsColumn);
+  mainWrapper.appendChild(container);
+  mainWrapper.appendChild(blogsColumn);
+
+  document.body.appendChild(mainWrapper);
 
   // Tooltip
   elements.tooltip = document.createElement("div");
@@ -336,32 +395,48 @@ function clickCursor() {
 
 // Event Listeners
 function addEventListeners() {
-  state.canvas.addEventListener("mousemove", (e) => {
-    state.mouse.x = e.clientX;
-    state.mouse.y = e.clientY;
-  });
-
-  state.canvas.addEventListener("touchmove", (e) => {
-    if (e.touches.length > 0) {
-      state.mouse.x = e.touches[0].clientX;
-      state.mouse.y = e.touches[0].clientY;
-      e.preventDefault();
+  // Mouse and touch events for grid
+  const handlePointerMove = (e) => {
+    const x = e.clientX || (e.touches && e.touches[0].clientX);
+    const y = e.clientY || (e.touches && e.touches[0].clientY);
+    if (x && y) {
+      state.mouse.x = x;
+      state.mouse.y = y;
     }
+  };
+
+  state.canvas.addEventListener("mousemove", handlePointerMove);
+  state.canvas.addEventListener("touchmove", (e) => {
+    handlePointerMove(e);
+    e.preventDefault();
   });
 
+  // Window resize
   window.addEventListener("resize", resizeCanvas);
+
+  // Cursor events
   document.addEventListener("mousemove", updateCursor);
   document.addEventListener("mousedown", clickCursor);
 
-  // Add hover effects for interactive elements
-  document.querySelectorAll("button, a, input").forEach((element) => {
-    element.addEventListener("mouseenter", () =>
-      setCursorSize(CONFIG.cursor.outer.scale.hover)
-    );
-    element.addEventListener("mouseleave", () =>
-      setCursorSize(CONFIG.cursor.outer.scale.normal)
-    );
-  });
+  // Event delegation for interactive elements
+  document.body.addEventListener("mouseenter", (e) => {
+    const target = e.target;
+    if (target.matches("button, a, input")) {
+      setCursorSize(CONFIG.cursor.outer.scale.hover);
+    }
+  }, true);
+
+  document.body.addEventListener("mouseleave", (e) => {
+    const target = e.target;
+    if (target.matches("button, a, input")) {
+      setCursorSize(CONFIG.cursor.outer.scale.normal);
+    }
+  }, true);
+
+  // Controls container cursor toggle
+  const controlsContainer = document.querySelector(".controls-container");
+  controlsContainer.addEventListener("mouseenter", () => toggleCustomCursor());
+  controlsContainer.addEventListener("mouseleave", () => toggleCustomCursor());
 
   // Start cursor animation loop if cursor was initialized successfully
   if (elements.cursorInner && elements.cursorOuter) {
@@ -382,19 +457,26 @@ function initializeCanvas() {
 function resizeCanvas() {
   state.width = state.canvas.width = window.innerWidth;
   state.height = state.canvas.height = window.innerHeight;
+  
+  // Adjust grid density based on screen size
+  const screenArea = state.width * state.height;
+  const isLargeScreen = screenArea > 1920 * 1080;
+  state.isHighDensity = isLargeScreen;
+  
   rebuildGrid();
 }
 
 function rebuildGrid() {
-  state.rows = Math.ceil(state.height / CONFIG.grid.spacing) + 1;
-  state.cols = Math.ceil(state.width / CONFIG.grid.spacing) + 1;
+  const spacing = state.isHighDensity ? CONFIG.grid.spacing * 2 : CONFIG.grid.spacing;
+  state.rows = Math.ceil(state.height / spacing) + 1;
+  state.cols = Math.ceil(state.width / spacing) + 1;
 
   state.originalPoints = [];
   for (let y = 0; y < state.rows; y++) {
     for (let x = 0; x < state.cols; x++) {
       state.originalPoints.push({
-        x: x * CONFIG.grid.spacing,
-        y: y * CONFIG.grid.spacing,
+        x: x * spacing,
+        y: y * spacing,
       });
     }
   }
@@ -403,14 +485,15 @@ function rebuildGrid() {
 function getDistortedPoint(point) {
   const dx = point.x - state.mouse.x;
   const dy = point.y - state.mouse.y;
-  const distance = Math.sqrt(dx * dx + dy * dy);
+  const distanceSquared = dx * dx + dy * dy;
+  const maxDistanceSquared = CONFIG.grid.maxDistance * CONFIG.grid.maxDistance;
 
-  if (distance < CONFIG.grid.maxDistance) {
+  if (distanceSquared < maxDistanceSquared) {
+    const distance = Math.sqrt(distanceSquared);
     const angle = Math.atan2(dy, dx);
-    const force =
-      (1 - distance / CONFIG.grid.maxDistance) *
-      CONFIG.grid.maxDisplacement *
-      (CONFIG.grid.warpStrength / 10000);
+    const force = (1 - distance / CONFIG.grid.maxDistance) * 
+                 CONFIG.grid.maxDisplacement * 
+                 (CONFIG.grid.warpStrength / 10000);
     return {
       x: point.x - Math.cos(angle) * force,
       y: point.y - Math.sin(angle) * force,
@@ -419,31 +502,63 @@ function getDistortedPoint(point) {
   return point;
 }
 
-function animate() {
+function animate(timestamp) {
+  // Calculate FPS
+  if (state.lastFrameTime) {
+    state.fps = 1000 / (timestamp - state.lastFrameTime);
+    state.frameCount++;
+
+    // Adjust grid density based on performance
+    if (timestamp - PERFORMANCE.lastDensityCheck > PERFORMANCE.densityAdjustmentInterval) {
+      if (state.fps < PERFORMANCE.minFPS && !state.isHighDensity) {
+        state.isHighDensity = true;
+        rebuildGrid();
+      } else if (state.fps > PERFORMANCE.targetFPS && state.isHighDensity) {
+        state.isHighDensity = false;
+        rebuildGrid();
+      }
+      PERFORMANCE.lastDensityCheck = timestamp;
+    }
+  }
+  state.lastFrameTime = timestamp;
+
+  // Clear canvas
   state.ctx.clearRect(0, 0, state.width, state.height);
-  state.ctx.strokeStyle = getComputedStyle(
-    document.documentElement
-  ).getPropertyValue("--grid-color");
+  state.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue("--grid-color");
   state.ctx.lineWidth = 1;
 
+  // Batch draw operations
+  state.ctx.beginPath();
+
+  // Draw horizontal lines
   for (let y = 0; y < state.rows; y++) {
     for (let x = 0; x < state.cols - 1; x++) {
       const i = y * state.cols + x;
       const p1 = getDistortedPoint(state.originalPoints[i]);
       const p2 = getDistortedPoint(state.originalPoints[i + 1]);
-      drawLine(p1, p2);
+      
+      if (x === 0) {
+        state.ctx.moveTo(p1.x, p1.y);
+      }
+      state.ctx.lineTo(p2.x, p2.y);
     }
   }
 
-  for (let y = 0; y < state.rows - 1; y++) {
-    for (let x = 0; x < state.cols; x++) {
+  // Draw vertical lines
+  for (let x = 0; x < state.cols; x++) {
+    for (let y = 0; y < state.rows - 1; y++) {
       const i = y * state.cols + x;
       const p1 = getDistortedPoint(state.originalPoints[i]);
       const p3 = getDistortedPoint(state.originalPoints[i + state.cols]);
-      drawLine(p1, p3);
+      
+      if (y === 0) {
+        state.ctx.moveTo(p1.x, p1.y);
+      }
+      state.ctx.lineTo(p3.x, p3.y);
     }
   }
 
+  state.ctx.stroke();
   requestAnimationFrame(animate);
 }
 
@@ -467,25 +582,31 @@ function toggleTheme() {
 
 // Tooltip
 function initializeTooltip() {
-  document.querySelectorAll(".link").forEach((link) => {
-    link.addEventListener("mouseenter", (e) => {
-      const tooltip = document.getElementById("tooltip");
+  const tooltip = document.getElementById("tooltip");
+  
+  document.body.addEventListener("mouseenter", (e) => {
+    const link = e.target.closest(".link");
+    if (link) {
       tooltip.style.display = "block";
       tooltip.style.left = `${e.pageX}px`;
       tooltip.style.top = `${e.pageY - 30}px`;
       tooltip.textContent = link.title;
-    });
+    }
+  }, true);
 
-    link.addEventListener("mouseleave", () => {
-      document.getElementById("tooltip").style.display = "none";
-    });
+  document.body.addEventListener("mouseleave", (e) => {
+    if (e.target.closest(".link")) {
+      tooltip.style.display = "none";
+    }
+  }, true);
 
-    link.addEventListener("mousemove", (e) => {
-      const tooltip = document.getElementById("tooltip");
+  document.body.addEventListener("mousemove", (e) => {
+    const link = e.target.closest(".link");
+    if (link) {
       tooltip.style.left = `${e.pageX}px`;
       tooltip.style.top = `${e.pageY - 30}px`;
-    });
-  });
+    }
+  }, true);
 }
 
 // Initialize Application
@@ -536,6 +657,34 @@ document.addEventListener("DOMContentLoaded", async () => {
         linksContainer.appendChild(link);
       }
     });
+
+    // Populate projects
+    const projectsList = document.querySelector(".projects-column .content-list");
+    data.projects.forEach(project => {
+      const projectElement = document.createElement("div");
+      projectElement.className = "project-item";
+      projectElement.innerHTML = `
+        <h3>${project.name}</h3>
+        <p>${project.subtitle}</p>
+      `;
+      projectsList.appendChild(projectElement);
+    });
+
+    // Populate blogs
+    const blogsList = document.querySelector(".blogs-column .content-list");
+    data.blogs.forEach(blog => {
+      const blogElement = document.createElement("div");
+      blogElement.className = "blog-item";
+      blogElement.innerHTML = `
+        <div class="blog-header">
+          <span class="blog-type ${blog.type}">${blog.type === 'written' ? '✍️' : '📖'}</span>
+          <h3><a href="${blog.link}" target="_blank">${blog.title}</a></h3>
+        </div>
+        <p>${blog.summary}</p>
+      `;
+      blogsList.appendChild(blogElement);
+    });
+
   } catch (error) {
     console.error("Error loading data:", error);
   }

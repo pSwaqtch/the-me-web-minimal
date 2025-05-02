@@ -2,7 +2,7 @@
   "personalInfo": {
     "name": "Krupal Virani",
     "penName": "pSwaqtch",
-    "title": "Maker • Hardware Enthusiast • CS Student",
+    "title": "Maker • Embedded Hardware • CS Student",
     "education": "B.Tech CSE - 4th Semester",
     "bio": "A passionate maker and computer science enthusiast exploring the intersection of hardware and software. Currently working on innovative projects combining physical computing with software solutions."
   },
@@ -30,5 +30,39 @@
       "heading": "Arial",
       "body": "Arial"
     }
-  }
+  },
+  "projects": [
+    {
+      "name": "Project 1",
+      "subtitle": "A brief description of what this project does"
+    },
+    {
+      "name": "Project 2",
+      "subtitle": "Another project with its description"
+    },
+    {
+      "name": "Project 3",
+      "subtitle": "One more project to showcase"
+    }
+  ],
+  "blogs": [
+    {
+      "type": "written",
+      "title": "My First Blog Post",
+      "link": "https://example.com/blog/post1",
+      "summary": "A one-line summary of what this blog post is about"
+    },
+    {
+      "type": "read",
+      "title": "Interesting Article",
+      "link": "https://example.com/article",
+      "summary": "A brief summary of why this article was worth reading"
+    },
+    {
+      "type": "written",
+      "title": "Technical Deep Dive",
+      "link": "https://example.com/blog/technical",
+      "summary": "Exploring complex technical concepts in simple terms"
+    }
+  ]
 } 

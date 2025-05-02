@@ -40,78 +40,65 @@ body {
     width: 100%;
     height: 100%; 
     opacity: 0.8;
+    z-index: 0;
 }
 
 canvas {
     display: block;
 }
 
-.controls {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    background: rgba(0, 0, 0, 0.7);
-    padding: 10px;
-    border-radius: 5px;
-    z-index: 100;
-}
-
-.controls label {
-    display: block;
-    margin: 5px 0;
-    color: white;
-    font-size: 12px;
-}
-
-.controls input[type="range"] {
-    width: 100px;
-}
-
-.tooltip {
-    position: absolute;
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 5px 10px;
-    border-radius: 3px;
-    font-size: 12px;
-    display: none;
-    z-index: 100;
-}
-
-.theme-toggle {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    padding: 10px;
-    background-color: var(--accent-color);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    width: 45px;
-    height: 45px;
+/* Main Layout */
+.main-wrapper {
     display: flex;
-    align-items: center;
     justify-content: center;
-    transition: transform 0.2s, background-color 0.3s;
-    z-index: 100;
-}
-
-.theme-toggle:hover {
-    transform: scale(1.1);
+    align-items: flex-start;
+    gap: 2rem;
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+    z-index: 1;
 }
 
 .container {
+    flex: 2;
+    min-width: 300px;
+    max-width: 600px;
+    margin: 0;
     text-align: center;
-    z-index: 1;
+    z-index: 2;
     padding: 20px;
     border-radius: 10px;
     background-color: rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(5px);
-    max-width: 600px;
-    margin: 0 auto;
+    pointer-events: none;
 }
 
+.column {
+    flex: 1;
+    min-width: 250px;
+    background-color: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(5px);
+    border-radius: 10px;
+    padding: 1.5rem;
+    transition: transform 0.3s ease;
+    pointer-events: auto;
+}
+
+.column h2 {
+    color: var(--accent-color);
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+.content-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Typography */
 h1 {
     font-size: 3rem;
     font-weight: bold;
@@ -126,85 +113,79 @@ h1 {
     opacity: 0.8;
 }
 
+/* Links */
 .links {
     display: flex;
-    gap: 3rem; /* Increased gap between links */
-    margin-top: 30px; /* Increased margin */
+    gap: 3rem;
+    margin-top: 30px;
     justify-content: center;
-    flex-wrap: wrap; /* Allow wrapping for smaller screens */
+    flex-wrap: wrap;
+    pointer-events: auto;
 }
 
 .link {
     color: var(--text-color);
-    font-size: 2rem; /* Increased font size */
+    font-size: 2rem;
     transition: all 0.3s ease;
     text-decoration: none;
-    padding: 15px; /* Increased padding */
-    border: 2px solid transparent; /* Optional: Add border for hover effect */
-    border-radius: 5px; /* Optional: Rounded corners */
+    padding: 15px;
+    border: 2px solid transparent;
+    border-radius: 5px;
 }
 
 .link:hover {
     color: var(--accent-color);
-    transform: translateY(-5px); /* Slightly increased hover effect */
-    border-color: var(--accent-color); /* Optional: Highlight border on hover */
-}
-.container {
-/* Existing styles */
-pointer-events: none; /* Add this line */
-}
-.links, .link {
-pointer-events: auto; /* Add this to keep links clickable */
+    transform: translateY(-5px);
+    border-color: var(--accent-color);
 }
 
+/* Controls */
 .controls-container {
-position: fixed;
-top: 10px;
-right: 10px;
-z-index: 200; /* Ensure it is above other elements */
-display: flex;
-flex-direction: column; /* Stack the button and controls vertically */
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
 }
 
 .toggle-controls {
-background: var(--accent-color);
-color: white;
-border: none;
-padding: 10px;
-border-radius: 5px;
-cursor: pointer;
-font-size: 14px;
-margin-bottom: 5px;
-z-index: 201; /* Ensure the button is above the controls */
-position: relative; /* Ensure it stays in the flow of the container */
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-bottom: 5px;
+    z-index: 201;
+    position: relative;
 }
 
 .controls {
-background: rgba(0, 0, 0, 0.7);
-padding: 10px;
-border-radius: 5px;
-display: block; /* Initially visible */
-z-index: 200; /* Ensure it is below the button */
-transition: display 0.3s ease; /* Smooth transition for display */
-display: none; /* Initially hidden */
-margin-top: 50px; /* Space between button and controls */
+    background: rgba(0, 0, 0, 0.7);
+    padding: 10px;
+    border-radius: 5px;
+    display: none;
+    z-index: 200;
+    transition: display 0.3s ease;
+    margin-top: 50px;
 }
 
 .controls label {
-display: block;
-margin: 5px 0;
-color: white;
-font-size: 12px;
+    display: block;
+    margin: 5px 0;
+    color: white;
+    font-size: 12px;
 }
 
 .controls input[type="range"] {
-width: 100px;
+    width: 100px;
 }
 
-.cursor-toggle {
+/* Toggle Buttons */
+.theme-toggle, .cursor-toggle {
     position: fixed;
-    bottom: 20px;
-    left: 20px;
     padding: 10px;
     background-color: var(--accent-color);
     color: white;
@@ -220,6 +201,175 @@ width: 100px;
     z-index: 100;
 }
 
-.cursor-toggle:hover {
+.theme-toggle {
+    top: 20px;
+    left: 20px;
+}
+
+.cursor-toggle {
+    bottom: 20px;
+    left: 20px;
+}
+
+.theme-toggle:hover, .cursor-toggle:hover {
     transform: scale(1.1);
+}
+
+/* Tooltip */
+.tooltip {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 3px;
+    font-size: 12px;
+    display: none;
+    z-index: 100;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .main-wrapper {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .column {
+        width: 100%;
+        max-width: 600px;
+    }
+}
+
+/* Hover Effects */
+.column:hover {
+    transform: translateY(-5px);
+}
+
+/* Project Items */
+.project-item {
+    background-color: rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    border-radius: 8px;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.project-item:hover {
+    transform: translateX(5px);
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.project-item h3 {
+    color: var(--accent-color);
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+}
+
+.project-item p {
+    color: var(--text-color);
+    opacity: 0.8;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* Blog Items */
+.blog-item {
+    background-color: rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    border-radius: 8px;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.blog-item:hover {
+    transform: translateX(5px);
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.blog-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.blog-type {
+    font-size: 1.2rem;
+}
+
+.blog-type.written {
+    color: var(--accent-color);
+}
+
+.blog-type.read {
+    color: var(--secondary-color);
+}
+
+.blog-item h3 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.blog-item h3 a {
+    color: var(--text-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.blog-item h3 a:hover {
+    color: var(--accent-color);
+}
+
+.blog-item p {
+    color: var(--text-color);
+    opacity: 0.8;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin: 0;
+}
+
+/* Warning Banner */
+.warning-banner {
+    position: relative;
+    width: 100%;
+    background-color: #ff4444;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    z-index: 1;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    animation: pulse 2s infinite;
+}
+
+.warning-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.warning-banner i {
+    font-size: 1.4rem;
+    animation: bounce 1s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        background-color: #ff4444;
+    }
+    50% {
+        background-color: #ff6666;
+    }
+    100% {
+        background-color: #ff4444;
+    }
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
 }
