@@ -1,23 +1,989 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Krupal Virani</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="css/styles.css">
-</head>
-<body data-theme="dark">
-    <!-- Gravity Grid Background -->
-    <canvas id="gravityGrid" class="background"></canvas>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Your Name - Hardware & Mechatronics</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap");
 
-    <!-- Tooltip -->
-    <div id="tooltip" class="tooltip">Hover over me!</div>
+            * {
+                font-family: "Inter", sans-serif;
+            }
 
-    <!-- Font Awesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+            body {
+                overflow: hidden;
+            }
 
-    <script type="module" src="js/main.js"></script>
+            #canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                z-index: -1;
+            }
 
-</body>
+            .card {
+                backdrop-filter: blur(40px) saturate(200%);
+                background: linear-gradient(
+                    135deg,
+                    rgba(255, 255, 255, 0.25) 0%,
+                    rgba(255, 255, 255, 0.1) 25%,
+                    rgba(255, 255, 255, 0.05) 50%,
+                    rgba(255, 255, 255, 0.1) 75%,
+                    rgba(255, 255, 255, 0.15) 100%
+                );
+                border: 2px solid transparent;
+                background-clip: padding-box;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .card::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                padding: 2px;
+                background: linear-gradient(
+                    135deg,
+                    rgba(255, 255, 255, 0.6) 0%,
+                    rgba(255, 255, 255, 0.1) 25%,
+                    rgba(255, 255, 255, 0.05) 50%,
+                    rgba(255, 255, 255, 0.2) 75%,
+                    rgba(255, 255, 255, 0.4) 100%
+                );
+                border-radius: inherit;
+                mask:
+                    linear-gradient(#fff 0 0) content-box,
+                    linear-gradient(#fff 0 0);
+                mask-composite: xor;
+                -webkit-mask-composite: xor;
+            }
+
+            .card::after {
+                content: "";
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: radial-gradient(
+                    circle,
+                    rgba(255, 255, 255, 0.1) 0%,
+                    transparent 70%
+                );
+                opacity: 0.3;
+                pointer-events: none;
+                animation: shimmer 8s linear infinite;
+            }
+
+            .dark .card {
+                background: linear-gradient(
+                    135deg,
+                    rgba(15, 23, 42, 0.8) 0%,
+                    rgba(30, 41, 59, 0.6) 25%,
+                    rgba(15, 23, 42, 0.4) 50%,
+                    rgba(30, 41, 59, 0.7) 75%,
+                    rgba(15, 23, 42, 0.9) 100%
+                );
+                box-shadow:
+                    0 0 80px rgba(0, 245, 255, 0.1),
+                    0 0 40px rgba(255, 0, 255, 0.1),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+            }
+
+            .dark .card::before {
+                background: linear-gradient(
+                    135deg,
+                    rgba(0, 245, 255, 0.4) 0%,
+                    rgba(255, 0, 255, 0.2) 25%,
+                    rgba(102, 126, 234, 0.1) 50%,
+                    rgba(0, 245, 255, 0.3) 75%,
+                    rgba(255, 0, 255, 0.5) 100%
+                );
+            }
+
+            .dark .card::after {
+                background: radial-gradient(
+                    circle,
+                    rgba(0, 245, 255, 0.15) 0%,
+                    rgba(255, 0, 255, 0.1) 50%,
+                    transparent 70%
+                );
+            }
+
+            @keyframes shimmer {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+
+            .social-icon {
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                background: linear-gradient(
+                    135deg,
+                    rgba(255, 255, 255, 0.2) 0%,
+                    rgba(255, 255, 255, 0.05) 50%,
+                    rgba(255, 255, 255, 0.15) 100%
+                );
+                backdrop-filter: blur(20px) saturate(180%);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .social-icon::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.4),
+                    transparent
+                );
+                transition: all 0.6s;
+            }
+
+            .social-icon:hover::before {
+                left: 100%;
+            }
+
+            .social-icon:hover {
+                transform: translateY(-4px) scale(1.05);
+                background: linear-gradient(
+                    135deg,
+                    rgba(255, 255, 255, 0.3) 0%,
+                    rgba(255, 255, 255, 0.1) 50%,
+                    rgba(255, 255, 255, 0.25) 100%
+                );
+                box-shadow:
+                    0 20px 40px rgba(0, 0, 0, 0.15),
+                    0 0 20px rgba(255, 255, 255, 0.2);
+            }
+
+            .dark .social-icon {
+                background: linear-gradient(
+                    135deg,
+                    rgba(15, 23, 42, 0.7) 0%,
+                    rgba(30, 41, 59, 0.4) 50%,
+                    rgba(15, 23, 42, 0.8) 100%
+                );
+                border: 1px solid rgba(0, 245, 255, 0.2);
+                box-shadow:
+                    0 8px 32px rgba(0, 0, 0, 0.3),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            }
+
+            .dark .social-icon::before {
+                background: linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(0, 245, 255, 0.6),
+                    transparent
+                );
+            }
+
+            .dark .social-icon:hover {
+                background: linear-gradient(
+                    135deg,
+                    rgba(0, 245, 255, 0.2) 0%,
+                    rgba(255, 0, 255, 0.1) 50%,
+                    rgba(0, 245, 255, 0.3) 100%
+                );
+                border-color: rgba(0, 245, 255, 0.4);
+                box-shadow:
+                    0 20px 40px rgba(0, 0, 0, 0.4),
+                    0 0 30px rgba(0, 245, 255, 0.3),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            }
+
+            /* Theme Toggle - Now positioned at screen corner */
+            .theme-toggle {
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                background: linear-gradient(
+                    135deg,
+                    rgba(255, 255, 255, 0.25) 0%,
+                    rgba(255, 255, 255, 0.1) 100%
+                );
+                backdrop-filter: blur(20px) saturate(180%);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                position: relative;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .theme-toggle::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(
+                    45deg,
+                    transparent 30%,
+                    rgba(255, 255, 255, 0.2) 50%,
+                    transparent 70%
+                );
+                transform: translateX(-100%) rotate(45deg);
+                transition: transform 0.6s;
+            }
+
+            .theme-toggle:hover::before {
+                transform: translateX(100%) rotate(45deg);
+            }
+
+            .theme-toggle:hover {
+                transform: rotate(180deg) scale(1.1);
+                background: linear-gradient(
+                    135deg,
+                    rgba(255, 255, 255, 0.4) 0%,
+                    rgba(255, 255, 255, 0.2) 100%
+                );
+                box-shadow:
+                    0 10px 30px rgba(0, 0, 0, 0.2),
+                    0 0 20px rgba(255, 255, 255, 0.3);
+            }
+
+            .dark .theme-toggle {
+                background: linear-gradient(
+                    135deg,
+                    rgba(0, 245, 255, 0.3) 0%,
+                    rgba(255, 0, 255, 0.2) 100%
+                );
+                border: 1px solid rgba(0, 245, 255, 0.4);
+                box-shadow: 0 0 20px rgba(0, 245, 255, 0.2);
+            }
+
+            .dark .theme-toggle::before {
+                background: linear-gradient(
+                    45deg,
+                    transparent 30%,
+                    rgba(0, 245, 255, 0.4) 50%,
+                    transparent 70%
+                );
+            }
+
+            .dark .theme-toggle:hover {
+                background: linear-gradient(
+                    135deg,
+                    rgba(0, 245, 255, 0.5) 0%,
+                    rgba(255, 0, 255, 0.3) 100%
+                );
+                box-shadow:
+                    0 10px 30px rgba(0, 0, 0, 0.4),
+                    0 0 30px rgba(0, 245, 255, 0.5);
+            }
+
+            /* Resize Handle Styles */
+            .resize-handle {
+                position: absolute;
+                bottom: 0;
+                right: 0;
+                width: 20px;
+                height: 20px;
+                cursor: nw-resize;
+                background: linear-gradient(
+                    135deg,
+                    rgba(255, 255, 255, 0.3) 0%,
+                    rgba(255, 255, 255, 0.1) 100%
+                );
+                border-top-left-radius: 8px;
+                border-bottom-right-radius: inherit;
+                transition: all 0.3s ease;
+                opacity: 0;
+                transform: scale(0.8);
+            }
+
+            .resize-handle::before {
+                content: "";
+                position: absolute;
+                bottom: 3px;
+                right: 3px;
+                width: 2px;
+                height: 8px;
+                background: rgba(255, 255, 255, 0.6);
+                border-radius: 1px;
+                box-shadow:
+                    -4px 0 0 rgba(255, 255, 255, 0.4),
+                    -8px 0 0 rgba(255, 255, 255, 0.2);
+            }
+
+            .resize-handle::after {
+                content: "";
+                position: absolute;
+                bottom: 3px;
+                right: 3px;
+                width: 8px;
+                height: 2px;
+                background: rgba(255, 255, 255, 0.6);
+                border-radius: 1px;
+                box-shadow:
+                    0 -4px 0 rgba(255, 255, 255, 0.4),
+                    0 -8px 0 rgba(255, 255, 255, 0.2);
+            }
+
+            .dark .resize-handle {
+                background: linear-gradient(
+                    135deg,
+                    rgba(0, 245, 255, 0.4) 0%,
+                    rgba(255, 0, 255, 0.2) 100%
+                );
+            }
+
+            .dark .resize-handle::before {
+                background: rgba(0, 245, 255, 0.8);
+                box-shadow:
+                    -4px 0 0 rgba(0, 245, 255, 0.6),
+                    -8px 0 0 rgba(0, 245, 255, 0.3);
+            }
+
+            .dark .resize-handle::after {
+                background: rgba(0, 245, 255, 0.8);
+                box-shadow:
+                    0 -4px 0 rgba(0, 245, 255, 0.6),
+                    0 -8px 0 rgba(0, 245, 255, 0.3);
+            }
+
+            .card:hover .resize-handle,
+            .card.resizing .resize-handle {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            .resize-handle:hover,
+            .resize-handle.active {
+                background: linear-gradient(
+                    135deg,
+                    rgba(255, 255, 255, 0.5) 0%,
+                    rgba(255, 255, 255, 0.3) 100%
+                );
+                transform: scale(1.2);
+                box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+            }
+
+            .dark .resize-handle:hover,
+            .dark .resize-handle.active {
+                background: linear-gradient(
+                    135deg,
+                    rgba(0, 245, 255, 0.6) 0%,
+                    rgba(255, 0, 255, 0.4) 100%
+                );
+                box-shadow: 0 0 20px rgba(0, 245, 255, 0.4);
+            }
+
+            .card.resizing {
+                transition: none !important;
+            }
+
+            /* Resize indicator dots */
+            @media (max-width: 768px) {
+                .resize-handle {
+                    width: 24px;
+                    height: 24px;
+                    opacity: 0.7;
+                }
+
+                .resize-handle::before {
+                    width: 3px;
+                    height: 10px;
+                    bottom: 4px;
+                    right: 4px;
+                    box-shadow:
+                        -5px 0 0 rgba(255, 255, 255, 0.4),
+                        -10px 0 0 rgba(255, 255, 255, 0.2);
+                }
+
+                .resize-handle::after {
+                    width: 10px;
+                    height: 3px;
+                    bottom: 4px;
+                    right: 4px;
+                    box-shadow:
+                        0 -5px 0 rgba(255, 255, 255, 0.4),
+                        0 -10px 0 rgba(255, 255, 255, 0.2);
+                }
+            }
+
+            .gradient-text {
+                background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .dark .gradient-text {
+                background: linear-gradient(45deg, #00f5ff 0%, #ff00ff 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+        </style>
+    </head>
+    <body
+        class="dark min-h-screen bg-gray-900 text-white transition-colors duration-500"
+    >
+        <canvas id="canvas"></canvas>
+
+        <!-- Theme Toggle - moved to screen corner -->
+        <button
+            id="themeToggle"
+            class="theme-toggle fixed top-6 right-6 w-12 h-12 rounded-full z-10"
+        >
+            <svg
+                class="w-5 h-5 block dark:hidden"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+            >
+                <path
+                    fill-rule="evenodd"
+                    d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+                    clip-rule="evenodd"
+                ></path>
+            </svg>
+            <svg
+                class="w-5 h-5 hidden dark:block"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+            >
+                <path
+                    d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"
+                ></path>
+            </svg>
+        </button>
+
+        <div class="min-h-screen flex items-center justify-center p-4">
+            <div
+                id="resizableCard"
+                class="card rounded-3xl p-8 w-full max-w-sm relative"
+                style="
+                    min-width: 300px;
+                    min-height: 200px;
+                    max-width: 600px;
+                    max-height: 500px;
+                    resize: none;
+                "
+            >
+                <!-- Main Content -->
+                <div class="text-center">
+                    <h1 class="text-3xl font-semibold mb-2 gradient-text">
+                        Your Name
+                    </h1>
+                    <p class="text-sm opacity-70 mb-8 leading-relaxed">
+                        hardware | mechatronics | building cool weird stuff
+                    </p>
+
+                    <!-- Social Links -->
+                    <div class="flex gap-4 justify-center">
+                        <a
+                            href="https://github.com/yourusername"
+                            target="_blank"
+                            class="social-icon w-12 h-12 rounded-xl flex items-center justify-center"
+                        >
+                            <svg
+                                class="w-6 h-6"
+                                fill="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
+                                />
+                            </svg>
+                        </a>
+
+                        <a
+                            href="https://twitter.com/yourusername"
+                            target="_blank"
+                            class="social-icon w-12 h-12 rounded-xl flex items-center justify-center"
+                        >
+                            <svg
+                                class="w-6 h-6"
+                                fill="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"
+                                />
+                            </svg>
+                        </a>
+
+                        <a
+                            href="https://discord.com/users/youruserid"
+                            target="_blank"
+                            class="social-icon w-12 h-12 rounded-xl flex items-center justify-center"
+                        >
+                            <svg
+                                class="w-6 h-6"
+                                fill="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419-.0002 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1568 2.4189Z"
+                                />
+                            </svg>
+                        </a>
+
+                        <a
+                            href="mailto:your.email@example.com"
+                            class="social-icon w-12 h-12 rounded-xl flex items-center justify-center"
+                        >
+                            <svg
+                                class="w-6 h-6"
+                                fill="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-.904.732-1.636 1.636-1.636h1.872l8.492 6.93 8.492-6.93h1.872c.904 0 1.636.732 1.636 1.636z"
+                                />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Resize Handle -->
+                <div class="resize-handle" id="resizeHandle"></div>
+            </div>
+        </div>
+
+        <script>
+            // Canvas setup
+            const canvas = document.getElementById("canvas");
+            const ctx = canvas.getContext("2d");
+            let particles = [];
+            let mouse = { x: 0, y: 0 };
+            let touches = [];
+
+            // Resize canvas
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+
+            resizeCanvas();
+            window.addEventListener("resize", resizeCanvas);
+
+            // Particle class
+            class Particle {
+                constructor(x, y, type = "normal") {
+                    this.x = x;
+                    this.y = y;
+                    this.type = type;
+                    this.vx = (Math.random() - 0.5) * 4;
+                    this.vy = (Math.random() - 0.5) * 4;
+                    this.size = Math.random() * 4 + 1;
+                    this.life = 1;
+                    this.decay = Math.random() * 0.015 + 0.005;
+                    this.color = this.getColor();
+                    this.connections = [];
+
+                    // Wave properties for ambient particles
+                    this.waveOffset = Math.random() * Math.PI * 2;
+                    this.waveSpeed = Math.random() * 0.02 + 0.01;
+                    this.waveAmplitude = Math.random() * 50 + 20;
+
+                    // Pulsing effect
+                    this.pulseOffset = Math.random() * Math.PI * 2;
+                    this.pulseSpeed = Math.random() * 0.05 + 0.02;
+                }
+
+                getColor() {
+                    const isDark = document.body.classList.contains("dark");
+                    if (isDark) {
+                        const colors = [
+                            "rgba(0, 245, 255, ",
+                            "rgba(255, 0, 255, ",
+                            "rgba(102, 126, 234, ",
+                            "rgba(118, 75, 162, ",
+                            "rgba(0, 255, 127, ",
+                            "rgba(255, 105, 180, ",
+                        ];
+                        return colors[
+                            Math.floor(Math.random() * colors.length)
+                        ];
+                    } else {
+                        const colors = [
+                            "rgba(102, 126, 234, ",
+                            "rgba(118, 75, 162, ",
+                            "rgba(79, 172, 254, ",
+                            "rgba(0, 242, 254, ",
+                            "rgba(159, 122, 234, ",
+                            "rgba(255, 154, 158, ",
+                        ];
+                        return colors[
+                            Math.floor(Math.random() * colors.length)
+                        ];
+                    }
+                }
+
+                update() {
+                    if (this.type === "ambient") {
+                        // Floating wave motion for ambient particles
+                        this.waveOffset += this.waveSpeed;
+                        this.x += Math.sin(this.waveOffset) * 0.5;
+                        this.y += Math.cos(this.waveOffset * 0.7) * 0.3;
+                    } else {
+                        this.x += this.vx;
+                        this.y += this.vy;
+                    }
+
+                    this.life -= this.decay;
+
+                    // Mouse/touch interaction
+                    const dx = mouse.x - this.x;
+                    const dy = mouse.y - this.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < 200) {
+                        const force = (200 - distance) / 200;
+                        if (this.type === "interactive") {
+                            // Attracted to cursor
+                            this.vx += (dx / distance) * force * 0.5;
+                            this.vy += (dy / distance) * force * 0.5;
+                        } else {
+                            // Gentle repulsion for ambient particles
+                            this.vx -= (dx / distance) * force * 0.1;
+                            this.vy -= (dy / distance) * force * 0.1;
+                        }
+                    }
+
+                    // Friction
+                    this.vx *= 0.98;
+                    this.vy *= 0.98;
+
+                    // Boundary wrap
+                    if (this.x < 0) this.x = canvas.width;
+                    if (this.x > canvas.width) this.x = 0;
+                    if (this.y < 0) this.y = canvas.height;
+                    if (this.y > canvas.height) this.y = 0;
+                }
+
+                draw() {
+                    ctx.save();
+
+                    // Pulsing effect
+                    const pulseSize =
+                        this.size +
+                        Math.sin(
+                            Date.now() * this.pulseSpeed + this.pulseOffset,
+                        ) *
+                            0.5;
+
+                    ctx.globalAlpha = this.life;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, pulseSize, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color + this.life + ")";
+                    ctx.fill();
+
+                    // Enhanced glow effect
+                    ctx.shadowBlur = 30;
+                    ctx.shadowColor = this.color + this.life * 0.8 + ")";
+                    ctx.fill();
+
+                    // Inner bright core
+                    ctx.shadowBlur = 10;
+                    ctx.globalAlpha = this.life * 0.8;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, pulseSize * 0.3, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color + this.life * 0.9 + ")";
+                    ctx.fill();
+
+                    ctx.restore();
+                }
+
+                drawConnections() {
+                    // Draw connections to nearby particles
+                    for (let other of particles) {
+                        if (other === this) continue;
+
+                        const dx = other.x - this.x;
+                        const dy = other.y - this.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance < 100 && Math.random() < 0.02) {
+                            ctx.save();
+                            ctx.globalAlpha =
+                                (1 - distance / 100) *
+                                this.life *
+                                other.life *
+                                0.3;
+                            ctx.strokeStyle =
+                                this.color + this.life * 0.5 + ")";
+                            ctx.lineWidth = 0.5;
+                            ctx.beginPath();
+                            ctx.moveTo(this.x, this.y);
+                            ctx.lineTo(other.x, other.y);
+                            ctx.stroke();
+                            ctx.restore();
+                        }
+                    }
+                }
+            }
+
+            // Mouse events
+            canvas.addEventListener("mousemove", (e) => {
+                mouse.x = e.clientX;
+                mouse.y = e.clientY;
+
+                // Create interactive particles on mouse move
+                if (Math.random() < 0.4) {
+                    particles.push(
+                        new Particle(e.clientX, e.clientY, "interactive"),
+                    );
+                }
+            });
+
+            // Touch events
+            canvas.addEventListener("touchstart", handleTouch);
+            canvas.addEventListener("touchmove", handleTouch);
+            canvas.addEventListener("touchend", handleTouchEnd);
+
+            function handleTouch(e) {
+                e.preventDefault();
+                touches = Array.from(e.touches);
+
+                for (let touch of touches) {
+                    mouse.x = touch.clientX;
+                    mouse.y = touch.clientY;
+
+                    // Create burst of interactive particles on touch
+                    for (let i = 0; i < 8; i++) {
+                        particles.push(
+                            new Particle(
+                                touch.clientX + (Math.random() - 0.5) * 60,
+                                touch.clientY + (Math.random() - 0.5) * 60,
+                                "interactive",
+                            ),
+                        );
+                    }
+                }
+            }
+
+            function handleTouchEnd(e) {
+                touches = Array.from(e.touches);
+                if (touches.length === 0) {
+                    mouse.x = -1000;
+                    mouse.y = -1000;
+                }
+            }
+
+            // Animation loop
+            function animate() {
+                // Create subtle trails instead of clearing completely
+                ctx.fillStyle = document.body.classList.contains("dark")
+                    ? "rgba(15, 23, 42, 0.1)"
+                    : "rgba(249, 250, 251, 0.1)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Draw connections first (behind particles)
+                for (let particle of particles) {
+                    if (particle.type === "ambient") {
+                        particle.drawConnections();
+                    }
+                }
+
+                // Update and draw particles
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    particles[i].update();
+                    particles[i].draw();
+
+                    if (particles[i].life <= 0) {
+                        particles.splice(i, 1);
+                    }
+                }
+
+                // Maintain ambient particle count
+                while (
+                    particles.filter((p) => p.type === "ambient").length < 50
+                ) {
+                    particles.push(
+                        new Particle(
+                            Math.random() * canvas.width,
+                            Math.random() * canvas.height,
+                            "ambient",
+                        ),
+                    );
+                }
+
+                // Limit total particles for performance
+                if (particles.length > 150) {
+                    particles = particles.slice(-150);
+                }
+
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+
+            // Resize functionality
+            const card = document.getElementById("resizableCard");
+            const resizeHandle = document.getElementById("resizeHandle");
+            let isResizing = false;
+            let startX, startY, startWidth, startHeight;
+
+            // Mouse events for desktop
+            resizeHandle.addEventListener("mousedown", initResize);
+            document.addEventListener("mousemove", doResize);
+            document.addEventListener("mouseup", stopResize);
+
+            // Touch events for mobile
+            resizeHandle.addEventListener("touchstart", initResizeTouch, {
+                passive: false,
+            });
+            document.addEventListener("touchmove", doResizeTouch, {
+                passive: false,
+            });
+            document.addEventListener("touchend", stopResize);
+
+            function initResize(e) {
+                isResizing = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                startWidth = parseInt(
+                    document.defaultView.getComputedStyle(card).width,
+                    10,
+                );
+                startHeight = parseInt(
+                    document.defaultView.getComputedStyle(card).height,
+                    10,
+                );
+                card.classList.add("resizing");
+                resizeHandle.classList.add("active");
+                e.preventDefault();
+            }
+
+            function initResizeTouch(e) {
+                const touch = e.touches[0];
+                isResizing = true;
+                startX = touch.clientX;
+                startY = touch.clientY;
+                startWidth = parseInt(
+                    document.defaultView.getComputedStyle(card).width,
+                    10,
+                );
+                startHeight = parseInt(
+                    document.defaultView.getComputedStyle(card).height,
+                    10,
+                );
+                card.classList.add("resizing");
+                resizeHandle.classList.add("active");
+                e.preventDefault();
+            }
+
+            function doResize(e) {
+                if (!isResizing) return;
+
+                const newWidth = startWidth + e.clientX - startX;
+                const newHeight = startHeight + e.clientY - startY;
+
+                // Apply constraints
+                const minWidth = 300;
+                const maxWidth = Math.min(600, window.innerWidth - 32);
+                const minHeight = 200;
+                const maxHeight = Math.min(500, window.innerHeight - 32);
+
+                const constrainedWidth = Math.max(
+                    minWidth,
+                    Math.min(maxWidth, newWidth),
+                );
+                const constrainedHeight = Math.max(
+                    minHeight,
+                    Math.min(maxHeight, newHeight),
+                );
+
+                card.style.width = constrainedWidth + "px";
+                card.style.height = constrainedHeight + "px";
+                card.style.maxWidth = "none";
+            }
+
+            function doResizeTouch(e) {
+                if (!isResizing) return;
+
+                const touch = e.touches[0];
+                const newWidth = startWidth + touch.clientX - startX;
+                const newHeight = startHeight + touch.clientY - startY;
+
+                // Apply constraints
+                const minWidth = 300;
+                const maxWidth = Math.min(600, window.innerWidth - 32);
+                const minHeight = 200;
+                const maxHeight = Math.min(500, window.innerHeight - 32);
+
+                const constrainedWidth = Math.max(
+                    minWidth,
+                    Math.min(maxWidth, newWidth),
+                );
+                const constrainedHeight = Math.max(
+                    minHeight,
+                    Math.min(maxHeight, newHeight),
+                );
+
+                card.style.width = constrainedWidth + "px";
+                card.style.height = constrainedHeight + "px";
+                card.style.maxWidth = "none";
+
+                e.preventDefault();
+            }
+
+            function stopResize() {
+                if (isResizing) {
+                    isResizing = false;
+                    card.classList.remove("resizing");
+                    resizeHandle.classList.remove("active");
+                }
+            }
+
+            // Cursor change on hover (desktop only)
+            if (!("ontouchstart" in window)) {
+                const cardRect = card.getBoundingClientRect();
+
+                card.addEventListener("mousemove", (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const threshold = 25;
+
+                    if (
+                        x > rect.width - threshold &&
+                        y > rect.height - threshold
+                    ) {
+                        card.style.cursor = "nw-resize";
+                    } else {
+                        card.style.cursor = "default";
+                    }
+                });
+
+                card.addEventListener("mouseleave", () => {
+                    card.style.cursor = "default";
+                });
+            }
+
+            // Theme toggle
+            const themeToggle = document.getElementById("themeToggle");
+            themeToggle.addEventListener("click", () => {
+                document.body.classList.toggle("dark");
+                // Update particle colors
+                particles.forEach((particle) => {
+                    particle.color = particle.getColor();
+                });
+            });
+
+            // Initialize with ambient particles
+            for (let i = 0; i < 40; i++) {
+                particles.push(
+                    new Particle(
+                        Math.random() * canvas.width,
+                        Math.random() * canvas.height,
+                        "ambient",
+                    ),
+                );
+            }
+        </script>
+    </body>
 </html>
