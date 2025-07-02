@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Volumetric Display Log — Krupal</title>
+        <style>
+            body {
+                font-family: sans-serif;
+                background: #f5f5f5;
+                padding: 20px;
+                max-width: 700px;
+                margin: auto;
+            }
+            .block {
+                background: white;
+                border-radius: 8px;
+                padding: 16px;
+                margin-bottom: 20px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+            .block img {
+                max-width: 100%;
+                border-radius: 4px;
+                margin-top: 10px;
+            }
+            .date {
+                color: gray;
+                font-size: 0.85em;
+                margin-bottom: 8px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>🌀 Volumetric Display Log</h1>
+
+        <div class="block">
+            <div class="date">July 2, 2025</div>
+            <p>
+                Today I figured out the HUB75 pinout for my P1.875 panel and
+                started mapping it to 74HCT245 using the Pi GPIOs. Looks
+                promising.
+            </p>
+            <img src="images/pinout.jpg" alt="Pinout Diagram" />
+        </div>
+
+        <div class="block">
+            <div class="date">June 30, 2025</div>
+            <p>
+                Started working on the rotational mechanism. Looking for a
+                better bearing. 6015 is too costly.
+            </p>
+            <img src="images/bearing.jpg" alt="Bearing experiment" />
+        </div>
+
+        <!-- Just copy-paste more <div class="block"> sections here to add more entries -->
+    </body>
+</html>
