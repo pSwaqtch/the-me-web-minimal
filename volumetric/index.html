@@ -2,57 +2,186 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Volumetric Display Log — Krupal</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Volumetric Display – Krupal</title>
         <style>
             body {
-                font-family: sans-serif;
-                background: #f5f5f5;
-                padding: 20px;
-                max-width: 700px;
-                margin: auto;
+                font-family: serif;
+                max-width: 800px;
+                margin: 60px auto;
+                padding: 0 16px 100px;
+                line-height: 1.7;
+                transition:
+                    background 0.3s,
+                    color 0.3s;
             }
-            .block {
-                background: white;
-                border-radius: 8px;
-                padding: 16px;
-                margin-bottom: 20px;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            }
-            .block img {
+            img {
                 max-width: 100%;
-                border-radius: 4px;
-                margin-top: 10px;
+                display: block;
+                margin: 24px auto;
+                border-radius: 8px;
             }
-            .date {
-                color: gray;
-                font-size: 0.85em;
-                margin-bottom: 8px;
+            h1,
+            h2,
+            h3 {
+                font-weight: normal;
+                margin-top: 2em;
+            }
+            a {
+                color: #0055ff;
+                text-decoration: none;
+            }
+            a:hover {
+                text-decoration: underline;
+            }
+            code {
+                background: #eee;
+                padding: 2px 6px;
+                border-radius: 4px;
+            }
+            pre {
+                background: #f2f2f2;
+                padding: 12px;
+                overflow-x: auto;
+                border-radius: 6px;
+            }
+
+            /* THEMES */
+            body[data-theme="light"] {
+                background: #fdfdfd;
+                color: #111;
+            }
+            body[data-theme="sepia"] {
+                background: #f4ecd8;
+                color: #433;
+            }
+            body[data-theme="dark"] {
+                background: #111;
+                color: #ddd;
+            }
+            body[data-theme="dark"] a {
+                color: #7fb0ff;
+            }
+            body[data-theme="sepia"] code {
+                background: #e8e0cc;
+            }
+            body[data-theme="dark"] code {
+                background: #222;
+            }
+
+            /* TOGGLE */
+            #theme-toggle {
+                position: fixed;
+                top: 16px;
+                right: 16px;
+                font-size: 0.9em;
+                font-family: monospace;
+                user-select: none;
+            }
+            #theme-toggle a {
+                color: inherit;
+                margin: 0 4px;
+                cursor: pointer;
+            }
+
+            /* FOOTER */
+            footer {
+                text-align: center;
+                margin-top: 80px;
+                font-size: 0.9em;
+                opacity: 0.6;
+                border-top: 1px solid #ccc;
+                padding-top: 40px;
+            }
+            footer a {
+                margin: 0 10px;
+                color: inherit;
+                font-family: monospace;
             }
         </style>
     </head>
-    <body>
-        <h1>🌀 Volumetric Display Log</h1>
-
-        <div class="block">
-            <div class="date">July 2, 2025</div>
-            <p>
-                Today I figured out the HUB75 pinout for my P1.875 panel and
-                started mapping it to 74HCT245 using the Pi GPIOs. Looks
-                promising.
-            </p>
-            <img src="images/pinout.jpg" alt="Pinout Diagram" />
+    <body data-theme="light">
+        <div id="theme-toggle">
+            <a onclick="setTheme('light')">Light</a>|
+            <a onclick="setTheme('sepia')">Sepia</a>|
+            <a onclick="setTheme('dark')">Dark</a>
         </div>
+        <h1>🌀 Volumetric Display Log — Krupal</h1>
+<p>Welcome to my living build diary.<br />
+No dates, no blog CMS—just a raw Markdown file that gets rendered into the sleek HTML you’re reading.</p>
+<blockquote>
+<p><strong>Goal:</strong> A 360° LED volumetric display driven by a rotating 128 × 64 HUB75 matrix.</p>
+</blockquote>
+<hr />
+<h2>Index <em>(jump links)</em></h2>
+<ol>
+<li><a href="#system-overview">System Overview</a>  </li>
+<li><a href="#electronics">Electronics</a>  </li>
+<li><a href="#mechanics">Mechanics</a>  </li>
+<li><a href="#firmware--software">Firmware &amp; Software</a>  </li>
+<li><a href="#challenges--roadblocks">Challenges / Roadblocks</a>  </li>
+<li><a href="#next-milestones">Next Milestones</a>  </li>
+</ol>
+<hr />
+<h2>System Overview</h2>
+<p><img alt="Rendered Concept" src="images/rendered-concept.jpg" /></p>
+<p>At a glance:</p>
+<ul>
+<li>128 × 64 P1.875 LED panel (HUB75)</li>
+<li>Raspberry Pi 4 (may switch to STM32F4)</li>
+<li>Dual <strong>74HCT245</strong> level‑shifters</li>
+<li>12 V DC motor + ODrive controller</li>
+<li><strong>ASL9013</strong> 6‑wire slip ring for power/data</li>
+<li>3D‑printed frame + 6015 (might replace) bearing</li>
+</ul>
+<hr />
+<h2>Electronics</h2>
+<h3>HUB75 Pinout Mapping</h3>
+<p>```text
+RPI GPIO 17  → R1
+RPI GPIO 27  → G1
+RPI GPIO 22  → B1
+RPI GPIO 10  → CLK
+RPI GPIO 9   → LAT
+RPI GPIO 11  → OE</p>
+<h1>Address lines (A–E) on second 74HCT245</h1>
+        <footer>
+            <div>
+                <a href="mailto:krupalvirani@gmail.com">Gmail</a> |
+                <a href="https://x.com/krupal_virani" target="_blank"
+                    >Twitter</a
+                >
+                |
+                <a href="https://instagram.com/krupal_virani" target="_blank"
+                    >Instagram</a
+                >
+                |
+                <a href="https://github.com/pSwaqtch" target="_blank">GitHub</a>
+                |
+                <a href="https://reddit.com/u/pSwaqtch" target="_blank"
+                    >Reddit</a
+                >
+                |
+                <a
+                    href="https://discord.com/users/996417997344358400"
+                    target="_blank"
+                    >Discord</a
+                >
+            </div>
+            <div>
+                Made with &lt;3 | <a url="krupalvirani.com">Krupal Virani</a>
+            </div>
+        </footer>
 
-        <div class="block">
-            <div class="date">June 30, 2025</div>
-            <p>
-                Started working on the rotational mechanism. Looking for a
-                better bearing. 6015 is too costly.
-            </p>
-            <img src="images/bearing.jpg" alt="Bearing experiment" />
-        </div>
-
-        <!-- Just copy-paste more <div class="block"> sections here to add more entries -->
+        <script>
+            function setTheme(name) {
+                document.body.dataset.theme = name;
+                localStorage.setItem("theme", name);
+            }
+            (function () {
+                const saved = localStorage.getItem("theme");
+                if (saved) setTheme(saved);
+            })();
+        </script>
     </body>
 </html>
