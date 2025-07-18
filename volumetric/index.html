@@ -106,45 +106,61 @@
             <a onclick="setTheme('sepia')">Sepia</a>|
             <a onclick="setTheme('dark')">Dark</a>
         </div>
-        <h1>🌀 Volumetric Display Log — Krupal</h1>
-<p>Welcome to my living build diary.<br />
-No dates, no blog CMS—just a raw Markdown file that gets rendered into the sleek HTML you’re reading.</p>
+        <h1>Volumetric Display Log — Krupal</h1>
+<p><em>This is where I'm documenting LED display experiments. No structure, just thoughts and progress as it happens.</em></p>
+<p>The following is my way through understanding and trying to make a volumetric display. Some parts of it are flagged nonchalant, they contain what is irrelevant to the volumetric thing.</p>
+<hr />
+<h2>The Journey Begins [&gt;]</h2>
+<p>It started with <strong>Voxon Photonics</strong> happening to my YT feed. It felt magical to me and a constant urge to make one for myself, I just want to hold it in my hands, and see with my naked eyes. But I was busy researching in maths (Ramsey's theorem) and distro hopping.</p>
+<p>Then <strong>mitxela</strong> happened to my feed. With a candle. A what? A candle on a tiny rotating LED matrix which creates a <strong>POV</strong> (persistence of vision - your eyes see motion as continuous) to fake 3D. His setup: 8x10 LED matrix, a small DC motor, Li coin cell battery, rotate it fast enough, refresh the matrix proportionally fast enough and boom, you see 3D!</p>
+<p>The ultimatum was <strong>James Brown's</strong> YT video. He dropped a banger, assembly video of this vortex, the fucking 128x64 LED matrix volumetric display. This guy plays doom on this! I couldn't wait much. I started building one.</p>
+<p><strong>7th December</strong>, I ordered:
+- 8x8 generic LED matrix with <strong>MAX7219 driver</strong> (chip that controls multiple LEDs)
+- <strong>ESP8266</strong> (WiFi microcontroller)
+- <strong>BLDC motor</strong> (brushless DC motor - more precise than regular motors)
+- Some jumper wires</p>
+<p>Labour leverage (Naval style), made GPT build an iterative LED matrix control board webpage for me.</p>
+<p>Nothing worked, no LEDs on. Was thinking I got a wrong module, after scratching my ass on this for like two evenings, I realised the anodes and cathodes were interchanged. <strong>Lolol</strong> it light up and boom, I was now a hardware guy, I told to myself. <em>(I confirm I'm still not one)</em></p>
+<p>Bought a 12V 2A power supply and started with BLDC, this shit won't calibrate for real. Bought an <strong>IR sensor</strong> (detects rotation) and again GPT for helping me measure the RPM of this motor. Had much fun with this!</p>
+<p>But was running low with budget. A friend suggested <strong>bagel fund</strong>, I applied got <strong>$250</strong>.</p>
+<hr />
+<h2>Building Prototypes [*]</h2>
+<p>Started designing my first prototype. My <strong>v0</strong> was named <em>kirmaadaa</em>, a friend suggested and I kept it. No James Brown inspiration, only mitxela and my own tinkering. I love <strong>Blender</strong> (3D modeling software), designed one, got it 3D printed, and it was rotating like crazy! I was thinking to transfer power wirelessly. Very scrappy design but gave it a go.</p>
 <blockquote>
-<p><strong>Goal:</strong> A 360° LED volumetric display driven by a rotating 128 × 64 HUB75 matrix.</p>
+<p><em>v0 rotating video</em></p>
 </blockquote>
+<p><strong>Problems:</strong> Vibrations were crazy, design was not parametric (couldn't adjust dimensions easily).</p>
+<p><strong>V1 coming in!</strong> Learned <strong>CAD</strong> (computer aided design), Fusion 360. Implemented a timing belt system, two <strong>ESP32</strong> (upgraded microcontrollers) instead of one. <strong>ESPNow communication</strong> (wireless communication protocol) between them. <strong>PCB designing</strong> (printed circuit board - custom electronic boards), Easy EDA. Watched the vortex assembly video for around <strong>60-80 times</strong>.</p>
+<p><strong>Pavitra</strong>, building rockets back then and planes now, helped me with mechanical design. <strong>Mantra</strong>, an EC senior, helped with electronics a bit. Still code was a weak area for me.</p>
+<p>The electronics did not change much:
+- Custom PCB for driver and LED
+- Modules for IR and <strong>encoder</strong> (position sensor) for RPM control</p>
+<p><strong>Main highlight:</strong> custom <strong>slip ring implementation</strong> (device that allows power transfer while rotating). Seeing it spin at <strong>1800 RPM</strong> and transferring <strong>5V 5A</strong> current was gonna be cool!</p>
+<div class="codehilite"><pre><span></span><code><span class="n">I</span><span class="w"> </span><span class="n">fucked</span><span class="w"> </span><span class="n">up</span><span class="w"> </span><span class="n">at</span><span class="w"> </span><span class="n">choosing</span><span class="w"> </span><span class="n">LEDs</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">LED</span><span class="w"> </span><span class="n">drivers</span><span class="p">,</span><span class="w"> </span><span class="n">both</span><span class="p">.</span><span class="w"> </span><span class="n">I</span><span class="w"> </span><span class="n">had</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">PCBs</span><span class="w"> </span><span class="n">in</span><span class="w"> </span><span class="n">my</span><span class="w"> </span><span class="n">hand</span><span class="p">,</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">guilt</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">take</span><span class="w"> </span><span class="n">power</span><span class="w"> </span><span class="n">electronics</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">granted</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">regret</span><span class="p">.</span>
+</code></pre></div>
+
 <hr />
-<h2>Index <em>(jump links)</em></h2>
+<h2>Learning &amp; Understanding [+]</h2>
+<p>I paused this project. <strong>EV grant</strong> came in, learned more power electronics and general electronics from basics:
+- Diodes, gates, timer IC
+- <strong>PWM</strong> (pulse width modulation - controlling power)
+- <strong>SPI/I2C</strong> (communication protocols)
+- <strong>Buck-boost</strong> (voltage converters)
+- <strong>AC-DC converters</strong>
+- Some low level C programming</p>
+<p>Most of my time went understanding what <strong>James Brown</strong> did, from his design to the code. <strong>Devin</strong> helped a lot in going through the <strong>git repo</strong> (code repository).</p>
+<p>So the code has <strong>three main parts</strong>:</p>
 <ol>
-<li><a href="#system-overview">System Overview</a>  </li>
-<li><a href="#electronics">Electronics</a>  </li>
-<li><a href="#mechanics">Mechanics</a>  </li>
-<li><a href="#firmware--software">Firmware &amp; Software</a>  </li>
-<li><a href="#challenges--roadblocks">Challenges / Roadblocks</a>  </li>
-<li><a href="#next-milestones">Next Milestones</a>  </li>
+<li><strong>Vortex</strong> - runs on RPI (Raspberry Pi - small computer) and lights up the actual matrix</li>
+<li><strong>Virtex</strong> - OpenGL thing (graphics library), which simulates the actual display</li>
+<li><strong>Viewer</strong> - helps import 3D objects and images to memory buffer which is read by virtex and vortex</li>
 </ol>
+<p>I learned <strong>OpenGL</strong> and much of computer graphics while going through the repo.</p>
 <hr />
-<h2>System Overview</h2>
-<p><img alt="Rendered Concept" src="images/rendered-concept.jpg" /></p>
-<p>At a glance:</p>
-<ul>
-<li>128 × 64 P1.875 LED panel (HUB75)</li>
-<li>Raspberry Pi 4 (may switch to STM32F4)</li>
-<li>Dual <strong>74HCT245</strong> level‑shifters</li>
-<li>12 V DC motor + ODrive controller</li>
-<li><strong>ASL9013</strong> 6‑wire slip ring for power/data</li>
-<li>3D‑printed frame + 6015 (might replace) bearing</li>
-</ul>
+<h2>Current System Design [=]</h2>
+<p>writing in progres...</p>
 <hr />
-<h2>Electronics</h2>
-<h3>HUB75 Pinout Mapping</h3>
-<p>```text
-RPI GPIO 17  → R1
-RPI GPIO 27  → G1
-RPI GPIO 22  → B1
-RPI GPIO 10  → CLK
-RPI GPIO 9   → LAT
-RPI GPIO 11  → OE</p>
-<h1>Address lines (A–E) on second 74HCT245</h1>
+<p><em>End of log... for now</em></p>
         <footer>
             <div>
                 <a href="mailto:krupalvirani@gmail.com">Gmail</a> |
@@ -169,7 +185,9 @@ RPI GPIO 11  → OE</p>
                 >
             </div>
             <div>
-                Made with &lt;3 | <a url="krupalvirani.com">Krupal Virani</a>
+                Made with &lt;3 &nbsp; &nbsp; |
+                <a url="krupalvirani.com">Krupal Virani</a> , &nbsp; &nbsp;
+                Claude
             </div>
         </footer>
 
