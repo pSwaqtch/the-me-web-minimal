@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Volumetric Display – Krupal</title>
+        <style>
+            body {
+                font-family: serif;
+                max-width: 800px;
+                margin: 60px auto;
+                padding: 0 16px 100px;
+                line-height: 1.7;
+                transition:
+                    background 0.3s,
+                    color 0.3s;
+                position: relative;
+                z-index: 1;
+            }
+            #grid-canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: -1;
+                pointer-events: none;
+            }
+            img {
+                max-width: 100%;
+                display: block;
+                margin: 24px auto;
+                border-radius: 8px;
+            }
+            h1,
+            h2,
+            h3 {
+                font-weight: normal;
+                margin-top: 2em;
+            }
+            a {
+                color: #0055ff;
+                text-decoration: none;
+            }
+            a:hover {
+                text-decoration: underline;
+            }
+            code {
+                background: #eee;
+                padding: 2px 6px;
+                border-radius: 4px;
+            }
+            pre {
+                background: #f2f2f2;
+                padding: 12px;
+                overflow-x: auto;
+                border-radius: 6px;
+            }
+
+            /* THEMES */
+            body[data-theme="light"] {
+                background: #fdfdfd;
+                color: #111;
+            }
+            body[data-theme="sepia"] {
+                background: #f4ecd8;
+                color: #433;
+            }
+            body[data-theme="dark"] {
+                background: #111;
+                color: #ddd;
+            }
+            body[data-theme="dark"] a {
+                color: #7fb0ff;
+            }
+            body[data-theme="sepia"] a {
+                color: #d2691e;
+            }
+            body[data-theme="sepia"] code {
+                background: #e8e0cc;
+            }
+            body[data-theme="dark"] code {
+                background: #222;
+            }
+
+            /* Grid colors for themes */
+            :root {
+                --grid-color: #e0e0e0;
+            }
+
+            body[data-theme="sepia"] {
+                --grid-color: #d4c4a0;
+            }
+
+            body[data-theme="dark"] {
+                --grid-color: #2a2a2a;
+            }
+
+            /* TOGGLE */
+            #theme-toggle {
+                position: fixed;
+                top: 16px;
+                right: 16px;
+                font-size: 0.9em;
+                font-family: monospace;
+                user-select: none;
+            }
+            #theme-toggle a {
+                color: inherit;
+                margin: 0 4px;
+                cursor: pointer;
+            }
+
+            /* FOOTER */
+            footer {
+                text-align: center;
+                margin-top: 80px;
+                font-size: 0.9em;
+                opacity: 0.6;
+                border-top: 1px solid #ccc;
+                padding-top: 40px;
+            }
+            footer a {
+                margin: 0 10px;
+                color: inherit;
+                font-family: monospace;
+            }
+
+            .gallery {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 10px;
+                padding: 10px;
+            }
+
+            .gallery img {
+                width: 100%;
+                height: auto;
+                border-radius: 8px;
+                object-fit: cover;
+            }
+        </style>
+    </head>
+    <body data-theme="sepia">
+        <svg id="grid-canvas"></svg>
+
+        <div id="theme-toggle">
+            <a onclick="setTheme('light')">Light</a>|
+            <a onclick="setTheme('sepia')">Sepia</a>|
+            <a onclick="setTheme('dark')">Dark</a>
+        </div>
+        <h1>Volumetric Displays</h1>
+        <p>
+            my exploration on the contemporary creations of volumetric
+            displays...
+        </p>
+        <h3>MITXELA</h3>
+        <p>
+            his blog
+            <a href="https://mitxela.com/candle" target="_blank"
+                >mitxela.com/candle</a
+            >
+            might better explain this, but observations from my end:
+        </p>
+        <ul>
+            <li>
+                a very clever design, how he managed to fix the axle and rotate
+                the motor instead.
+            </li>
+            <li>
+                used a LiR2450 rechargeable coin cell to power the motor, RP2040
+                Tiny and the 8x10 LED matrix.
+            </li>
+            <li>
+                instead of rasterising an .obj file to voxels, he used an
+                intersection technique in Blender and exported the voxel data.
+            </li>
+        </ul>
+
+        <div class="gallery">
+            <img
+                alt="prototype without battery"
+                src="/volumetric/media/mitxela/prototype-without-battery.jpg.jpeg"
+            />
+            <img
+                alt="matrix test"
+                src="/volumetric/media/mitxela/matrix-test.jpg.jpeg"
+            />
+            <img
+                alt="spinning"
+                src="/volumetric/media/mitxela/spinning1.jpg.jpeg"
+            />
+        </div>
+
+        <ul>
+            <li>
+                i have made several export scripts and visualisers for this sort
+                of voxel exports. the site is live and code is up on github, do
+                check if you're making one. <br />
+                <a href="https://3d-volumetric-display-viewer.vercel.app/">
+                    https://3d-volumetric-display-viewer.vercel.app/
+                </a>
+                <a
+                    href="https://github.com/pSwaqtch/kirmaadaa_3d/tree/master/kirmaadaa_v0/3d_canvas"
+                >
+                    https://github.com/pSwaqtch/kirmaadaa_3d/tree/master/kirmaadaa_v0/3d_canvas
+                </a>
+            </li>
+        </ul>
+
+        <div class="gallery">
+            <img alt="webgl preview 3" src="/volumetric/media/webgl_3.png" />
+            <img alt="webgl preview 1" src="/volumetric/media/webgl_1.png" />
+            <img alt="webgl preview 2" src="/volumetric/media/webgl_2.png" />
+        </div>
+
+        <h3>Ancient James (James Brown)</h3>
+        <p>
+            James' version of the volumetric display is the most robust so far
+            from the makers around.
+        </p>
+        <ul>
+            <li>
+                two versions:
+                <ul>
+                    <li>
+                        one with 128x64 LED matrix (two 128x64 back and forth).
+                    </li>
+                    <li>another with 128x128 (two 128x64 side by side).</li>
+                </ul>
+            </li>
+            <li>
+                <a
+                    href="https://github.com/AncientJames/multivox"
+                    target="_blank"
+                    >github.com/AncientJames/multivox</a
+                >
+            </li>
+            <li>
+                the code includes three main programs:
+                <ol>
+                    <li>
+                        <strong>vortex</strong> – runs on Raspberry Pi and
+                        lights up the actual matrix.
+                    </li>
+                    <li>
+                        <strong>virtex</strong> – an OpenGL program which
+                        simulates the actual display.
+                    </li>
+                    <li>
+                        <strong>viewer</strong> – helps import 3D objects and
+                        images to memory buffer read by Virtex and Vortex.
+                    </li>
+                </ol>
+            </li>
+            <li>
+                his Mastodon thread has more content on volumetric displays than
+                anywhere else on the internet.
+            </li>
+            <li>
+                a very clear explanation on how to get a uniform voxel density
+                across the volume.
+            </li>
+            <li>
+                <a
+                    href="https://mastodon.social/@ancientjames/112597046453214197"
+                    target="_blank"
+                    >Mastodon Thread</a
+                >
+                <div class="gallery">
+                    <img src="/volumetric/media/james/james_multivox.jpg" />
+                    <img src="/volumetric/media/james/james_vortex_1.png" />
+                    <img
+                        src="/volumetric/media/james/james_voxel_density_0.png"
+                    />
+                </div>
+            </li>
+        </ul>
+
+        <h3>Voxon Photonics</h3>
+        <ul>
+            <li>
+                <a
+                    href="https://www.youtube.com/@Voxonphotonics"
+                    target="_blank"
+                    >youtube.com/@Voxonphotonics</a
+                >
+            </li>
+            <li>
+                The very first time i came across the term "a volumetric
+                display" was when Voxon Photonics happened to my feed. i was
+                amazed; it really felt magical to see how people were playing
+                games in true 3D. i think they are the pioneers of this tech,
+                though i've found a very old research paper on creating swept
+                volumetric displays (i'll attach the link soon, will have to go
+                crazy finding it in bookmarks).
+            </li>
+        </ul>
+
+        <h3>BrightVox</h3>
+        <ul>
+            <li>
+                <a href="https://brightvox.jp/" target="_blank"
+                    >https://brightvox.jp/</a
+                >
+            </li>
+            <li>
+                <a
+                    href="https://www.youtube.com/@brightvoxinc.4100"
+                    target="_blank"
+                    >https://www.youtube.com/@brightvoxinc.4100</a
+                >
+            </li>
+        </ul>
+
+        <footer>
+            <div>
+                <a href="mailto:krupalvirani@gmail.com">Gmail</a> |
+                <a href="https://x.com/krupal_virani" target="_blank"
+                    >Twitter</a
+                >
+                |
+                <a href="https://instagram.com/krupal_virani" target="_blank"
+                    >Instagram</a
+                >
+                |
+                <a href="https://github.com/pSwaqtch" target="_blank">GitHub</a>
+                |
+                <a href="https://reddit.com/u/pSwaqtch" target="_blank"
+                    >Reddit</a
+                >
+                |
+                <a
+                    href="https://discord.com/users/996417997344358400"
+                    target="_blank"
+                    >Discord</a
+                >
+            </div>
+            <div>
+                Made with &lt;3 &nbsp; &nbsp; |
+                <a url="krupalvirani.com">Krupal Virani</a>
+            </div>
+        </footer>
+
+        <script>
+            function setTheme(name) {
+                document.body.dataset.theme = name;
+                localStorage.setItem("theme", name);
+            }
+            (function () {
+                const saved = localStorage.getItem("theme");
+                if (saved) setTheme(saved);
+            })();
+
+            // Gravity grid effect
+            class GravityGrid {
+                constructor() {
+                    this.canvas = document.getElementById("grid-canvas");
+                    this.mouse = { x: 0, y: 0 };
+                    this.gridSize = 37;
+                    this.points = [];
+                    this.maxDistortion = 135;
+                    this.influenceRadius = 150;
+
+                    this.init();
+                    this.setupEvents();
+                    this.animate();
+                }
+
+                init() {
+                    this.updateSize();
+                    this.createPoints();
+                }
+
+                updateSize() {
+                    this.canvas.setAttribute("width", window.innerWidth);
+                    this.canvas.setAttribute("height", window.innerHeight);
+                    this.canvas.setAttribute(
+                        "viewBox",
+                        `0 0 ${window.innerWidth} ${window.innerHeight}`,
+                    );
+                }
+
+                createPoints() {
+                    this.points = [];
+                    const cols =
+                        Math.ceil(window.innerWidth / this.gridSize) + 2;
+                    const rows =
+                        Math.ceil(window.innerHeight / this.gridSize) + 2;
+
+                    for (let i = 0; i < cols; i++) {
+                        for (let j = 0; j < rows; j++) {
+                            this.points.push({
+                                x: i * this.gridSize,
+                                y: j * this.gridSize,
+                                origX: i * this.gridSize,
+                                origY: j * this.gridSize,
+                            });
+                        }
+                    }
+                }
+
+                setupEvents() {
+                    window.addEventListener("mousemove", (e) => {
+                        this.mouse.x = e.clientX;
+                        this.mouse.y = e.clientY;
+                    });
+
+                    window.addEventListener("resize", () => {
+                        this.updateSize();
+                        this.createPoints();
+                    });
+                }
+
+                distortPoint(point) {
+                    const dx = point.origX - this.mouse.x;
+                    const dy = point.origY - this.mouse.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < this.influenceRadius) {
+                        const force =
+                            (this.influenceRadius - distance) /
+                            this.influenceRadius;
+                        const angle = Math.atan2(dy, dx);
+                        const distortion = force * this.maxDistortion;
+
+                        // Shrink inward toward cursor
+                        point.x = point.origX - Math.cos(angle) * distortion;
+                        point.y = point.origY - Math.sin(angle) * distortion;
+                    } else {
+                        point.x = point.origX;
+                        point.y = point.origY;
+                    }
+                }
+
+                render() {
+                    this.canvas.innerHTML = "";
+                    this.points.forEach((p) => this.distortPoint(p));
+
+                    const cols =
+                        Math.ceil(window.innerWidth / this.gridSize) + 2;
+                    const rows =
+                        Math.ceil(window.innerHeight / this.gridSize) + 2;
+                    let pathData = "";
+
+                    // Vertical lines
+                    for (let i = 0; i < cols; i++) {
+                        for (let j = 0; j < rows - 1; j++) {
+                            const curr = this.points[i * rows + j];
+                            const next = this.points[i * rows + j + 1];
+                            if (curr && next) {
+                                pathData += `M ${curr.x} ${curr.y} L ${next.x} ${next.y} `;
+                            }
+                        }
+                    }
+
+                    // Horizontal lines
+                    for (let j = 0; j < rows; j++) {
+                        for (let i = 0; i < cols - 1; i++) {
+                            const curr = this.points[i * rows + j];
+                            const next = this.points[(i + 1) * rows + j];
+                            if (curr && next) {
+                                pathData += `M ${curr.x} ${curr.y} L ${next.x} ${next.y} `;
+                            }
+                        }
+                    }
+
+                    if (pathData) {
+                        const path = document.createElementNS(
+                            "http://www.w3.org/2000/svg",
+                            "path",
+                        );
+                        path.setAttribute("d", pathData);
+                        path.setAttribute("stroke", "var(--grid-color)");
+                        path.setAttribute("stroke-width", "0.2");
+                        path.setAttribute("fill", "none");
+                        path.setAttribute("opacity", "0.3");
+                        this.canvas.appendChild(path);
+                    }
+                }
+
+                animate() {
+                    this.render();
+                    requestAnimationFrame(() => this.animate());
+                }
+            }
+
+            new GravityGrid();
+        </script>
+    </body>
+</html>

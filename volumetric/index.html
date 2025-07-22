@@ -23,7 +23,7 @@
                 left: 0;
                 width: 100%;
                 height: 100%;
-                z-index: -2;
+                z-index: -1;
                 pointer-events: none;
             }
             img {
@@ -73,11 +73,27 @@
             body[data-theme="dark"] a {
                 color: #7fb0ff;
             }
+            body[data-theme="sepia"] a {
+                color: #d2691e;
+            }
             body[data-theme="sepia"] code {
                 background: #e8e0cc;
             }
             body[data-theme="dark"] code {
                 background: #222;
+            }
+
+            /* Grid colors for themes */
+            :root {
+                --grid-color: #e0e0e0;
+            }
+
+            body[data-theme="sepia"] {
+                --grid-color: #d4c4a0;
+            }
+
+            body[data-theme="dark"] {
+                --grid-color: #2a2a2a;
             }
 
             /* TOGGLE */
@@ -109,12 +125,26 @@
                 color: inherit;
                 font-family: monospace;
             }
-            :root {
-                --grid-color: #555; /* or any visible color */
+
+            .gallery {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 10px;
+                padding: 10px;
+            }
+
+            .gallery img,
+            .gallery video,
+            img,
+            video {
+                width: 100%;
+                height: auto;
+                border-radius: 8px;
+                object-fit: contain; /* No cropping */
+                aspect-ratio: auto; /* Uses natural aspect ratio */
             }
         </style>
     </head>
-    <body data-theme="sepia">
         <svg id="grid-canvas"></svg>
 
         <div id="theme-toggle">
@@ -122,159 +152,257 @@
             <a onclick="setTheme('sepia')">Sepia</a>|
             <a onclick="setTheme('dark')">Dark</a>
         </div>
-        <h1>Volumetric Display Log — Krupal</h1>
+        <h1>Volumetric Display</h1>
         <p>
-            <em
-                >This is where I'm documenting LED display experiments. No
-                structure, just thoughts and progress as it happens.</em
+            for a long time, i had known about the volumetric displays. mainly
+            from
+            <a href="https://voxon.co" target="_blank">Voxon Photonics</a> and
+            <a href="https://mitxela.com" target="_blank">Mitxela</a>. but i
+            finally got the kick when James Brown posted
+            <a href="https://youtu.be/pcAEqbYwixU"> "vortex assembly" </a>. he
+            dropped an assembly video of one of his super cool volumetric
+            displays yet, (he plays doom in it, common that's some real cool
+            stuff). i was about to complete my research on ramsey's theorem and
+            i opted for building a volumetric display for myself.
+        </p>
+        <p>
+            there was very little i knew formally and academically about
+            electronics. i started with a 8x8 generic monochrome led matrix and
+            an esp32 module.
+        </p>
+        <div class="gallery">
+            <img src="/volumetric/media/led_matrix_1.jpg" alt="LED Matrix 1" />
+            <video src="/volumetric/media/led_matrix_2.mp4" controls></video>
+        </div>
+        <p>
+            led matrix was quite fun. i connected esp to my local wifi and
+            set-up a web-server so i can control leds manually through a webpage
+            and was able to get some really cool patterns.
+        </p>
+        <p>
+            What a volumetric display basically is, and what it takes to build
+            one? you might have seen the led strip fans, which rotate really
+            fast and creates an 2d image in the air, the same goes with swept
+            volumetric displays, but with a greater dimension. here, we rotate a
+            led matrix, say an rectangle such that it sweeps some particular
+            area and we rotate it fast enough to create persistence of vision
+            and hence we see a real 3d image of the object.
+        </p>
+        <p>
+            so as you might have already guessed it takes an led matrix, a
+            controller(mcu), some sort of mechanism to rotate the whole thing
+            fast enough and a tonn of power(electricity) to build a volumetric
+            display. there are other ways to make this swept volumetric display,
+            one is to move an led matrix along its normal to sweep a cuboidal
+            volume instead of cyndrical one. Voxon as well as Jame's have thier
+            own versions in this style:
+        </p>
+        <blockquote>
+            <p>
+                <a href="https://youtu.be/SO_8FSfy1w0" target="_blank">
+                    Voxon Cuboidal Volumetric Display
+                </a>
+                |
+                <a
+                    href="https://mastodon.social/@ancientjames/111797746349387603"
+                    target="_blank"
+                >
+                    James' Cuboidal Volumetric Display
+                </a>
+            </p>
+        </blockquote>
+        <p>
+            but i continued with the one with cylindrical sweep, where we rotate
+            the led matrix, you'll knnow the reasons yourself as you read along.
+        </p>
+        <p>
+            i stared with a drone bldc motor (A2212 1000KV motor with 30A ESC).
+            for some reason i took a while for me to understand how the
+            calibration works and why is it necessary.<br />
+        </p>
+        <div class="gallery">
+            <video src="/volumetric/media/bldc_rpm_1.mp4" controls></video>
+        </div>
+        <p>
+            i tried to create a small pipeline so that motor always tries to run
+            at given rpm, the mcu adjusts pwm as per the feedback (rpm
+            measurement) from the ir sensor.
+        </p>
+        <p>
+            here are some sketches of my first design, though i did not give
+            much thought to how will i transfer power to the rotating leds.
+        </p>
+        <div class="gallery">
+            <img src="/volumetric/media/kirmaadaa_sketch_2.jpg" alt="" />
+            <img src="/volumetric/media/kirmaadaa_v1_model_1.jpg" alt="" />
+            <img src="/volumetric/media/kirmaadaa_v1_model_2.jpg" alt="" />
+            <img src="/volumetric/media/kirmaadaa_v1_sketch_1.jpg" alt="" />
+            <img src="/volumetric/media/kirmaadaa_v1_sketch_2.jpg" alt="" />
+            <img src="/volumetric/media/kirmaadaa_v1_sketch_0.png" alt="" />
+        </div>
+        <p>
+            as you can see in one of the sketches, it says slip rings. LEDs take
+            a lot of power, and are very sensitive to fluctuations in current
+            and voltage. so we need to transfer a lot of steady power to the
+            rotating element. there are multiple ways to do this, 1. tie up a
+            battery along side the LEDs and rotate it as well; 2. wireless
+            transmission with Qi or any other protocol; and 3. slip rings
+        </p>
+        <p>
+            battery will drain very quick and also affect the centre of mass
+            adversely, the wireless power transfer will lack efficiency. so the
+            only option left is slip rings. though my first iteration was a very
+            quick protopye to test motor rpm as well as learn cad. i went for it
+            without giving much thought to power transmission, i'd have used a
+            battery for then.
+        </p>
+        <div class="gallery">
+            <video src="/volumetric/media/kirmaadaa_v1_rotating_1.mp4" controls></video>
+        </div>
+        <p>
+            i moved to designing pcb for the led matrix. the voxel density is
+            not uniform across the volume in a swept volumetric display. there
+            are two ways to solve this, 1. change the structure of the matrix;
+            2. use leds with a driver which supports a higher refresh rate, and
+            write such a firmware which can ideally get us a uniform voxel
+            density across the volume.
+        </p>
+        <div class="gallery">
+            <img src="/volumetric/media/webgl_3.png" alt="" />
+            <img src="/volumetric/media/webgl_2.png" alt="" />
+        </div>
+        <p>
+            as you can see, the centre of the cylinder has very dense voxels and
+            they get sparse as r increases from the vertical/z/green axis. to
+            solve this various matrix fashions can be tried.
+        </p>
+        <img alt="" src="/volumetric/media/kirmaadaa_sketch_3.jpg" />
+        <p>
+            here, i have rotated the whole matrix by 90deg as well as the
+            distance between two adjacent columns decreases as the radius from
+            vertical axis increases. this may not result in a complete uniform
+            density, but makes it more ideal. also, software can help to create
+            a more uniform density of voxels. it is more clearly explained by
+            james in his mastodon thread.
+            <a
+                href="https://mastodon.social/@ancientjames/112597046453214197"
+                target="_blank"
             >
+                Read Here </a
+            >.
         </p>
         <p>
-            The following is my way through understanding and trying to make a
-            volumetric display. Some parts of it are flagged nonchalant, they
-            contain what is irrelevant to the volumetric thing.
+            normal / traditionally refreshing led matix v/s refreshing as
+            explained by James
         </p>
-        <hr />
-        <h2>The Journey Begins [&gt;]</h2>
+        <div class="gallery">
+            <video src="/volumetric/media/james/james_voxel_density_3.mp4" controls></video>
+            <video src="/volumetric/media/james/james_voxel_density_2.mp4" controls></video>
+        </div>
         <p>
-            It started with <strong>Voxon Photonics</strong> happening to my YT
-            feed. It felt magical to me and a constant urge to make one for
-            myself, I just want to hold it in my hands, and see with my naked
-            eyes. But I was busy researching in maths (Ramsey's theorem) and
-            distro hopping.
+            generally 3d objects are stored as obj, step or stl file. but none
+            of them contain object data which is rasterised into voxels. one
+            easy way is to use intersection based rasterisation, as done by
+            <a href="https://mitxela.com/candle" target="_blank">
+                Mitxela Candle
+            </a>
+            . i have made several export scripts and visualisers for this sort
+            of voxel exports. the site is live and code is up on github, do
+            check if you're making one.
+            <a
+                href="https://github.com/pSwaqtch/kirmaadaa_3d/tree/master/kirmaadaa_v0/3d_canvas"
+                target="_blank"
+            >
+                voxel data simulations
+            </a>
         </p>
-        <p>
-            Then <strong>mitxela</strong> happened to my feed. With a candle. A
-            what? A candle on a tiny rotating LED matrix which creates a
-            <strong>POV</strong> (persistence of vision - your eyes see motion
-            as continuous) to fake 3D. His setup: 8x10 LED matrix, a small DC
-            motor, Li coin cell battery, rotate it fast enough, refresh the
-            matrix proportionally fast enough and boom, you see 3D!
-        </p>
-        <p>
-            The ultimatum was <strong>James Brown's</strong> YT video. He
-            dropped a banger, assembly video of this vortex, the fucking 128x64
-            LED matrix volumetric display. This guy plays doom on this! I
-            couldn't wait much. I started building one.
-        </p>
-        <p>
-            <strong>7th December</strong>, I ordered: - 8x8 generic LED matrix
-            with <strong>MAX7219 driver</strong> (chip that controls multiple
-            LEDs) - <strong>ESP8266</strong> (WiFi microcontroller) -
-            <strong>BLDC motor</strong> (brushless DC motor - more precise than
-            regular motors) - Some jumper wires
-        </p>
-        <p>
-            Labour leverage (Naval style), made GPT build an iterative LED
-            matrix control board webpage for me. ![[IMG_20241209_183201745.jpg]]
-        </p>
-        <p>
-            Nothing worked, no LEDs on. Was thinking I got a wrong module, after
-            scratching my ass on this for like two evenings, I realised the
-            anodes and cathodes were interchanged. <strong>Lolol</strong> it
-            light up and boom, I was now a hardware guy, I told to myself.
-            <em>(I confirm I'm still not one)</em>
-        </p>
-        <p>![[IMG_20241222_222843202.jpg]]</p>
-        <p>
-            Bought a 12V 2A power supply and started with BLDC, this shit won't
-            calibrate for real. Bought an <strong>IR sensor</strong> (detects
-            rotation) and again GPT for helping me measure the RPM of this
-            motor. Had much fun with this!
-        </p>
-        <p>
-            But was running low with budget. A friend suggested
-            <strong>bagel fund</strong>, I applied got <strong>$250</strong>.
-        </p>
-        <hr />
-        <h2>Building Prototypes [*]</h2>
-        <p>
-            Started designing my first prototype. My <strong>v0</strong> was
-            named <em>kirmaadaa</em>, a friend suggested and I kept it. No James
-            Brown inspiration, only mitxela and my own tinkering. I love
-            <strong>Blender</strong> (3D modeling software), designed one, got
-            it 3D printed, and it was rotating like crazy! I was thinking to
-            transfer power wirelessly. Very scrappy design but gave it a go.
-        </p>
-        <blockquote></blockquote>
-        <p>
-            <strong>Problems:</strong> Vibrations were crazy, design was not
-            parametric (couldn't adjust dimensions easily).
-        </p>
-        <p>
-            <strong>V1 coming in!</strong> Learned
-            <strong>CAD</strong> (computer aided design), Fusion 360.
-            Implemented a timing belt system, two
-            <strong>ESP32</strong> (upgraded microcontrollers) instead of one.
-            <strong>ESPNow communication</strong> (wireless communication
-            protocol) between them. <strong>PCB designing</strong> (printed
-            circuit board - custom electronic boards), Easy EDA. Watched the
-            vortex assembly video for around <strong>60-80 times</strong>.
-        </p>
-        <p>
-            <strong>Pavitra</strong>, building rockets back then and planes now,
-            helped me with mechanical design. <strong>Mantra</strong>, an EC
-            senior, helped with electronics a bit. Still code was a weak area
-            for me.
-        </p>
-        <p>
-            The electronics did not change much: - Custom PCB for driver and LED
-            - Modules for IR and <strong>encoder</strong> (position sensor) for
-            RPM control
-        </p>
-        <p>
-            <strong>Main highlight:</strong> custom
-            <strong>slip ring implementation</strong> (device that allows power
-            transfer while rotating). Seeing it spin at
-            <strong>1800 RPM</strong> and transferring
-            <strong>5V 5A</strong> current was gonna be cool!
-        </p>
-        <div class="codehilite">
-            <pre><span></span><code><span class="n">I</span><span class="w"> </span><span class="n">fucked</span><span class="w"> </span><span class="n">up</span><span class="w"> </span><span class="n">at</span><span class="w"> </span><span class="n">choosing</span><span class="w"> </span><span class="n">LEDs</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">LED</span><span class="w"> </span><span class="n">drivers</span><span class="p">,</span><span class="w"> </span><span class="n">both</span><span class="p">.</span><span class="w"> </span><span class="n">I</span><span class="w"> </span><span class="n">had</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">PCBs</span><span class="w"> </span><span class="n">in</span><span class="w"> </span><span class="n">my</span><span class="w"> </span><span class="n">hand</span><span class="p">,</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">guilt</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">take</span><span class="w"> </span><span class="n">power</span><span class="w"> </span><span class="n">electronics</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">granted</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">regret</span><span class="p">.</span>
-</code></pre>
+        <div class="gallery">
+            <img src="/volumetric/media/webgl_1.png" alt="" />
+            <img src="/volumetric/media/webgl_3.png" alt="" />
         </div>
 
-        <hr />
-        <h2>Learning &amp; Understanding [+]</h2>
         <p>
-            I paused this project. <strong>EV grant</strong> came in, learned
-            more power electronics and general electronics from basics: -
-            Diodes, gates, timer IC - <strong>PWM</strong> (pulse width
-            modulation - controlling power) -
-            <strong>SPI/I2C</strong> (communication protocols) -
-            <strong>Buck-boost</strong> (voltage converters) -
-            <strong>AC-DC converters</strong> - Some low level C programming
+            as we saw the later, now coming back to pcb design. the genric
+            modules have max7129 drivers, they can at max go for 80Hz of refresh
+            frequency, which is way less than required. but to test power
+            supply, slip ring, and the overall integrity, as well as easy
+            accessiblity if damaged, i designed the PCBs with 2 max7129 driver
+            and 128 leds, each driver driving 64 leds. an 8x16 led matrix.
+        </p>
+        <div class="gallery">
+            <img src="/volumetric/media/kirmaadaa_pcb_1.jpg" alt="" />
+            <img src="/volumetric/media/kirmaadaa_pcb_2.jpg" alt="" />
+        </div>
+        <p>
+            by now, i was confident with fusion360 (cad designs) and easyeda
+            (PCB schematic and designs), though as i already knew photoshop,
+            illustrator and blender, i was familiar with jargons around the
+            designing softwares. i went for a bigger design this time, with
+            musch inspiration form the James' Vortex and Mitxela's Candle.
+        </p>
+        <div class="gallery">
+            <img src="/volumetric/media/kirmaadaa_sketch_1.jpg" alt="" />
+            <img src="/volumetric/media/kirmaadaa_acrylic_case_1.jpg" alt="" />
+            <img src="/volumetric/media/kirmaadaa_acrylic_case_2.jpg" alt="" />
+            <img src="/volumetric/media/kirmaadaa_acrylic_case_3.jpg" alt="" />
+            <img src="/volumetric/media/kirmaadaa_acrylic_case_4.jpg" alt="" />
+
+            <video src="/volumetric/media/kirmaadaa_rotating_1.mp4" controls></video>
+        </div>
+        <p>
+            initially the plan was to 3d print the whole structure, but later i
+            came to know laser cutting acrylic is very quick as well as acrylic
+            is a more suitable material for timing gears. i was driving the axle
+            with a gt2 timing belt driven by the same A2212 bldc motor as
+            before.
         </p>
         <p>
-            Most of my time went understanding what
-            <strong>James Brown</strong> did, from his design to the code.
-            <strong>Devin</strong> helped a lot in going through the
-            <strong>git repo</strong> (code repository).
+            the stack like structure would contain a buck convertor and an mcu
+            (esp32) to control motor rpm and the esc of bldc motor. the hole on
+            top and the wedges on the rotating disc are for a photo-interrupter
+            to know the angular displacement in real time as well as the rpm of
+            the rotating structure.
         </p>
-        <p>So the code has <strong>three main parts</strong>:</p>
-        <ol>
-            <li>
-                <strong>Vortex</strong> - runs on RPI (Raspberry Pi - small
-                computer) and lights up the actual matrix
-            </li>
-            <li>
-                <strong>Virtex</strong> - OpenGL thing (graphics library), which
-                simulates the actual display
-            </li>
-            <li>
-                <strong>Viewer</strong> - helps import 3D objects and images to
-                memory buffer which is read by virtex and vortex
-            </li>
-        </ol>
         <p>
-            I learned <strong>OpenGL</strong> and much of computer graphics
-            while going through the repo.
+            the top disk would house the semicircular PCB with drivers, and an
+            mcu (esp32), vertical to which would rest the led matrix.
         </p>
-        <hr />
-        <h2>Current System Design [=]</h2>
-        <p>writing in progres...</p>
-        <hr />
-        <p><em>End of log... for now</em></p>
+        <p>
+            the twitter thread has detailed pics:
+            <a
+                href="https://x.com/krupal_virani/status/1896654185762115664"
+                target="_blank"
+            >
+                see thread
+            </a>
+            .
+        </p>
+        <video src="/volumetric/media/kirmaadaa_slip_ring_4.mp4" controls></video>
+        <div class="gallery">
+            <video src="/volumetric/media/kirmaadaa_slip_ring_5.mp4" controls></video>
+            <img src="/volumetric/media/kirmaadaa_cad_9.jpeg" alt="" />
+            <img src="/volumetric/media/kirmaadaa_slip_ring_3.jpg" alt="" />
+        </div>
+        <p>
+            i think i over-engineered the slip ring part, but it was wort it. i
+            also added an encoder to get the angualr displacement accurately in
+            real time. the base assembly was ready:
+        </p>
+        <div class="gallery">
+             <img alt="" src="/volumetric/media/kirmaadaa_assembly.jpg" />
+        </div>
+        <p>
+            continuing the blog ...
+            <br />
+            more to add:
+        </p>
+        <ul>
+            <li>James' 25k lines of code</li>
+            <li>computer graphics</li>
+            <li>opengl simulations</li>
+            <li>data pipelines</li>
+        </ul>
+
         <footer>
             <div>
                 <a href="mailto:krupalvirani@gmail.com">Gmail</a> |
@@ -300,8 +428,7 @@
             </div>
             <div>
                 Made with &lt;3 &nbsp; &nbsp; |
-                <a url="krupalvirani.com">Krupal Virani</a> , &nbsp; &nbsp;
-                Claude
+                <a url="krupalvirani.com">Krupal Virani</a>
             </div>
         </footer>
 
@@ -437,7 +564,7 @@
                         path.setAttribute("stroke", "var(--grid-color)");
                         path.setAttribute("stroke-width", "0.2");
                         path.setAttribute("fill", "none");
-                        path.setAttribute("opacity", "0.3");
+                        path.setAttribute("opacity", "1");
                         this.canvas.appendChild(path);
                     }
                 }
